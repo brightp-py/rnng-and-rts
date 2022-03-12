@@ -1,0 +1,678 @@
+2021-09-15 15:30:36,451:__main__:INFO: Args: Namespace(train_file='data/train.txt', val_file='data/valid.txt', train_from='', sp_model='', fixed_stack=True, strategy='top_down', w_dim=256, h_dim=256, num_layers=2, dropout=0.3, composition='lstm', not_swap_in_order_stack=False, batch_group='similar_length', max_group_length_diff=20, group_sentence_size=1024, optimizer='adam', lr_scheduler=None, plateau_lr_decay=0.5, plateau_lr_patience=1, warmup_steps=10000, random_unk=False, batch_size=8, batch_token_size=15000, batch_action_size=45000, save_path='rnng.pt', num_epochs=18, min_epochs=8, lr=0.001, loss_normalize='batch', param_init=0, max_grad_norm=5, gpu=0, device='cuda', seed=3435, print_every=500, valid_every=-1, tensorboard_log_dir='', amp=False, early_stop=False, early_stop_patience=5)
+2021-09-15 15:37:45,507:__main__:INFO: Args: Namespace(amp=False, batch_action_size=45000, batch_group='similar_length', batch_size=32, batch_token_size=15000, composition='lstm', device='cuda', dropout=0.3, early_stop=False, early_stop_patience=5, fixed_stack=True, gpu=0, group_sentence_size=1024, h_dim=256, loss_normalize='batch', lr=0.001, lr_scheduler=None, max_grad_norm=5, max_group_length_diff=20, min_epochs=8, not_swap_in_order_stack=False, num_epochs=18, num_layers=2, optimizer='adam', param_init=0, plateau_lr_decay=0.5, plateau_lr_patience=1, print_every=500, random_unk=False, save_path='rnng.pt', seed=3435, sp_model='', strategy='top_down', tensorboard_log_dir='', train_file='data/ex-train.json', train_from='', val_file='data/ex-val.json', valid_every=-1, w_dim=256, warmup_steps=10000)
+2021-09-15 15:37:45,525:__main__:INFO: Train: 20 sents / 3 batches, Val: 20 sents / 14 batches
+2021-09-15 15:37:45,525:__main__:INFO: Vocab size: 305
+2021-09-15 15:39:08,942:__main__:INFO: Args: Namespace(amp=False, batch_action_size=45000, batch_group='similar_length', batch_size=32, batch_token_size=15000, composition='lstm', device='cpu', dropout=0.3, early_stop=False, early_stop_patience=5, fixed_stack=True, gpu=0, group_sentence_size=1024, h_dim=256, loss_normalize='batch', lr=0.001, lr_scheduler=None, max_grad_norm=5, max_group_length_diff=20, min_epochs=8, not_swap_in_order_stack=False, num_epochs=18, num_layers=2, optimizer='adam', param_init=0, plateau_lr_decay=0.5, plateau_lr_patience=1, print_every=500, random_unk=False, save_path='rnng.pt', seed=3435, sp_model='', strategy='top_down', tensorboard_log_dir='', train_file='data/ex-train.json', train_from='', val_file='data/ex-val.json', valid_every=-1, w_dim=256, warmup_steps=10000)
+2021-09-15 15:39:08,947:__main__:INFO: Train: 20 sents / 3 batches, Val: 20 sents / 14 batches
+2021-09-15 15:39:08,947:__main__:INFO: Vocab size: 305
+2021-09-15 15:39:08,969:__main__:INFO: model architecture
+2021-09-15 15:39:08,970:__main__:INFO: FixedStackRNNG(
+  (action_criterion): CrossEntropyLoss()
+  (word_criterion): CrossEntropyLoss()
+  (dropout): Dropout(p=0.3, inplace=True)
+  (emb): Sequential(
+    (0): Embedding(305, 256, padding_idx=0)
+    (1): Dropout(p=0.3, inplace=True)
+  )
+  (rnng): RNNGCell(
+    (dropout): Dropout(p=0.3, inplace=True)
+    (nt_emb): Sequential(
+      (0): Embedding(15, 256)
+      (1): Dropout(p=0.3, inplace=True)
+    )
+    (stack_rnn): MultiLayerLSTMCell(
+      (lstm): ModuleList(
+        (0): LSTMCell(256, 256)
+        (1): LSTMCell(256, 256)
+      )
+      (dropout_layer): Dropout(p=0.3, inplace=True)
+    )
+    (output): Sequential(
+      (0): Dropout(p=0.3, inplace=True)
+      (1): Linear(in_features=256, out_features=256, bias=True)
+      (2): ReLU()
+    )
+    (composition): LSTMComposition(
+      (rnn): LSTM(256, 256, batch_first=True, bidirectional=True)
+      (output): Sequential(
+        (0): Dropout(p=0.3, inplace=True)
+        (1): Linear(in_features=512, out_features=256, bias=True)
+        (2): ReLU()
+      )
+    )
+    (initial_emb): Sequential(
+      (0): Embedding(1, 256)
+      (1): Dropout(p=0.3, inplace=True)
+    )
+  )
+  (vocab_mlp): Linear(in_features=256, out_features=305, bias=True)
+  (action_mlp): Linear(in_features=256, out_features=18, bias=True)
+)
+2021-09-15 15:39:08,975:__main__:INFO: Model total parameters: 2389571
+2021-09-15 15:39:08,975:__main__:INFO: Starting epoch 1
+2021-09-15 15:39:11,662:__main__:INFO: Epoch: 1, Batch: 3/3, LR: 0.0010, ActionPPL: 17.57, WordPPL: 300.94, PPL: 39.255111, LL: 6613.487121582031, |Param|: 289.82, E[batch size]: 6.666666666666667, Throughput: 7.44 examples/sec
+2021-09-15 15:39:11,663:__main__:INFO: --------------------------------
+2021-09-15 15:39:11,663:__main__:INFO: Checking validation perplexity...
+2021-09-15 15:39:12,625:__main__:INFO: PPL: 38.695137, Loss: 7062.839340, ActionPPL: 17.046924, WordPPL: 327.248330
+2021-09-15 15:39:12,625:__main__:INFO: --------------------------------
+2021-09-15 15:39:12,626:__main__:INFO: Saving checkpoint to rnng.pt
+2021-09-15 15:39:12,675:__main__:INFO: Starting epoch 2
+2021-09-15 15:39:15,308:__main__:INFO: Epoch: 2, Batch: 3/3, LR: 0.0010, ActionPPL: 16.59, WordPPL: 221.48, PPL: 34.541990, LL: 6383.0006103515625, |Param|: 289.83, E[batch size]: 6.666666666666667, Throughput: 7.60 examples/sec
+2021-09-15 15:39:15,309:__main__:INFO: --------------------------------
+2021-09-15 15:39:15,309:__main__:INFO: Checking validation perplexity...
+2021-09-15 15:39:16,244:__main__:INFO: PPL: 37.128506, Loss: 6982.991882, ActionPPL: 15.959578, WordPPL: 334.759668
+2021-09-15 15:39:16,245:__main__:INFO: --------------------------------
+2021-09-15 15:39:16,246:__main__:INFO: Saving checkpoint to rnng.pt
+2021-09-15 15:39:16,275:__main__:INFO: Starting epoch 3
+2021-09-15 15:39:18,720:__main__:INFO: Epoch: 3, Batch: 3/3, LR: 0.0010, ActionPPL: 15.57, WordPPL: 186.33, PPL: 31.432584, LL: 6213.016784667969, |Param|: 289.85, E[batch size]: 6.666666666666667, Throughput: 8.18 examples/sec
+2021-09-15 15:39:18,721:__main__:INFO: --------------------------------
+2021-09-15 15:39:18,721:__main__:INFO: Checking validation perplexity...
+2021-09-15 15:39:19,749:__main__:INFO: PPL: 35.145334, Loss: 6876.938271, ActionPPL: 14.622700, WordPPL: 344.950828
+2021-09-15 15:39:19,750:__main__:INFO: --------------------------------
+2021-09-15 15:39:19,750:__main__:INFO: Saving checkpoint to rnng.pt
+2021-09-15 15:39:19,779:__main__:INFO: Starting epoch 4
+2021-09-15 15:39:22,224:__main__:INFO: Epoch: 4, Batch: 3/3, LR: 0.0010, ActionPPL: 14.17, WordPPL: 154.85, PPL: 27.880235, LL: 5996.908264160156, |Param|: 289.88, E[batch size]: 6.666666666666667, Throughput: 8.18 examples/sec
+2021-09-15 15:39:22,224:__main__:INFO: --------------------------------
+2021-09-15 15:39:22,224:__main__:INFO: Checking validation perplexity...
+2021-09-15 15:39:23,178:__main__:INFO: PPL: 34.137960, Loss: 6820.752052, ActionPPL: 12.983635, WordPPL: 423.355030
+2021-09-15 15:39:23,178:__main__:INFO: --------------------------------
+2021-09-15 15:39:23,179:__main__:INFO: Saving checkpoint to rnng.pt
+2021-09-15 15:39:23,210:__main__:INFO: Starting epoch 5
+2021-09-15 15:39:25,725:__main__:INFO: Epoch: 5, Batch: 3/3, LR: 0.0010, ActionPPL: 12.51, WordPPL: 136.94, PPL: 24.632023, LL: 5773.693298339844, |Param|: 289.91, E[batch size]: 6.666666666666667, Throughput: 7.95 examples/sec
+2021-09-15 15:39:25,726:__main__:INFO: --------------------------------
+2021-09-15 15:39:25,726:__main__:INFO: Checking validation perplexity...
+2021-09-15 15:39:26,635:__main__:INFO: PPL: 32.315628, Loss: 6714.764450, ActionPPL: 11.396383, WordPPL: 487.885449
+2021-09-15 15:39:26,636:__main__:INFO: --------------------------------
+2021-09-15 15:39:26,636:__main__:INFO: Saving checkpoint to rnng.pt
+2021-09-15 15:39:26,666:__main__:INFO: Starting epoch 6
+2021-09-15 15:39:29,044:__main__:INFO: Epoch: 6, Batch: 3/3, LR: 0.0010, ActionPPL: 10.68, WordPPL: 123.13, PPL: 21.334275, LL: 5514.6875, |Param|: 289.95, E[batch size]: 6.666666666666667, Throughput: 8.41 examples/sec
+2021-09-15 15:39:29,045:__main__:INFO: --------------------------------
+2021-09-15 15:39:29,045:__main__:INFO: Checking validation perplexity...
+2021-09-15 15:39:30,034:__main__:INFO: PPL: 31.119452, Loss: 6641.893501, ActionPPL: 9.214054, WordPPL: 740.815045
+2021-09-15 15:39:30,035:__main__:INFO: --------------------------------
+2021-09-15 15:39:30,036:__main__:INFO: Saving checkpoint to rnng.pt
+2021-09-15 15:39:30,066:__main__:INFO: Starting epoch 7
+2021-09-15 15:39:32,432:__main__:INFO: Epoch: 7, Batch: 3/3, LR: 0.0010, ActionPPL: 8.64, WordPPL: 113.51, PPL: 17.901998, LL: 5198.612060546875, |Param|: 290.00, E[batch size]: 6.666666666666667, Throughput: 8.45 examples/sec
+2021-09-15 15:39:32,433:__main__:INFO: --------------------------------
+2021-09-15 15:39:32,433:__main__:INFO: Checking validation perplexity...
+2021-09-15 15:39:33,405:__main__:INFO: PPL: 30.210278, Loss: 6584.608025, ActionPPL: 7.179642, WordPPL: 1274.922992
+2021-09-15 15:39:33,406:__main__:INFO: --------------------------------
+2021-09-15 15:39:33,407:__main__:INFO: Saving checkpoint to rnng.pt
+2021-09-15 15:39:33,437:__main__:INFO: Starting epoch 8
+2021-09-15 15:39:35,894:__main__:INFO: Epoch: 8, Batch: 3/3, LR: 0.0010, ActionPPL: 6.61, WordPPL: 133.90, PPL: 15.495592, LL: 4938.481201171875, |Param|: 290.05, E[batch size]: 6.666666666666667, Throughput: 8.14 examples/sec
+2021-09-15 15:39:35,894:__main__:INFO: --------------------------------
+2021-09-15 15:39:35,895:__main__:INFO: Checking validation perplexity...
+2021-09-15 15:39:36,838:__main__:INFO: PPL: 28.921009, Loss: 6500.345947, ActionPPL: 6.402195, WordPPL: 1468.403944
+2021-09-15 15:39:36,838:__main__:INFO: --------------------------------
+2021-09-15 15:39:36,839:__main__:INFO: Saving checkpoint to rnng.pt
+2021-09-15 15:39:36,870:__main__:INFO: Starting epoch 9
+2021-09-15 15:39:39,340:__main__:INFO: Epoch: 9, Batch: 3/3, LR: 0.0010, ActionPPL: 6.37, WordPPL: 91.15, PPL: 13.529093, LL: 4693.925964355469, |Param|: 290.09, E[batch size]: 6.666666666666667, Throughput: 8.10 examples/sec
+2021-09-15 15:39:39,341:__main__:INFO: --------------------------------
+2021-09-15 15:39:39,341:__main__:INFO: Checking validation perplexity...
+2021-09-15 15:39:40,275:__main__:INFO: PPL: 26.837731, Loss: 6355.910522, ActionPPL: 6.321649, WordPPL: 1159.144174
+2021-09-15 15:39:40,276:__main__:INFO: --------------------------------
+2021-09-15 15:39:40,277:__main__:INFO: Saving checkpoint to rnng.pt
+2021-09-15 15:39:40,307:__main__:INFO: Starting epoch 10
+2021-09-15 15:39:42,810:__main__:INFO: Epoch: 10, Batch: 3/3, LR: 0.0010, ActionPPL: 5.93, WordPPL: 68.37, PPL: 11.850602, LL: 4455.226318359375, |Param|: 290.14, E[batch size]: 6.666666666666667, Throughput: 7.99 examples/sec
+2021-09-15 15:39:42,810:__main__:INFO: --------------------------------
+2021-09-15 15:39:42,811:__main__:INFO: Checking validation perplexity...
+2021-09-15 15:39:43,725:__main__:INFO: PPL: 27.787211, Loss: 6423.080593, ActionPPL: 5.603295, WordPPL: 1798.881728
+2021-09-15 15:39:43,726:__main__:INFO: --------------------------------
+2021-09-15 15:39:43,726:__main__:INFO: Starting epoch 11
+2021-09-15 15:39:46,115:__main__:INFO: Epoch: 11, Batch: 3/3, LR: 0.0010, ActionPPL: 5.46, WordPPL: 55.53, PPL: 10.522521, LL: 4241.0390625, |Param|: 290.19, E[batch size]: 6.666666666666667, Throughput: 8.37 examples/sec
+2021-09-15 15:39:46,115:__main__:INFO: --------------------------------
+2021-09-15 15:39:46,115:__main__:INFO: Checking validation perplexity...
+2021-09-15 15:39:47,026:__main__:INFO: PPL: 26.229810, Loss: 6311.644146, ActionPPL: 5.352990, WordPPL: 1645.895782
+2021-09-15 15:39:47,027:__main__:INFO: --------------------------------
+2021-09-15 15:39:47,027:__main__:INFO: Saving checkpoint to rnng.pt
+2021-09-15 15:39:47,058:__main__:INFO: Starting epoch 12
+2021-09-15 15:39:49,536:__main__:INFO: Epoch: 12, Batch: 3/3, LR: 0.0010, ActionPPL: 5.11, WordPPL: 43.67, PPL: 9.374352, LL: 4032.835418701172, |Param|: 290.25, E[batch size]: 6.666666666666667, Throughput: 8.07 examples/sec
+2021-09-15 15:39:49,537:__main__:INFO: --------------------------------
+2021-09-15 15:39:49,537:__main__:INFO: Checking validation perplexity...
+2021-09-15 15:39:50,482:__main__:INFO: PPL: 27.782886, Loss: 6422.779861, ActionPPL: 5.036384, WordPPL: 2373.616103
+2021-09-15 15:39:50,483:__main__:INFO: --------------------------------
+2021-09-15 15:39:50,483:__main__:INFO: Starting epoch 13
+2021-09-15 15:39:52,953:__main__:INFO: Epoch: 13, Batch: 3/3, LR: 0.0010, ActionPPL: 4.93, WordPPL: 34.02, PPL: 8.512981, LL: 3859.1490478515625, |Param|: 290.31, E[batch size]: 6.666666666666667, Throughput: 8.10 examples/sec
+2021-09-15 15:39:52,953:__main__:INFO: --------------------------------
+2021-09-15 15:39:52,954:__main__:INFO: Checking validation perplexity...
+2021-09-15 15:39:53,880:__main__:INFO: PPL: 26.634539, Loss: 6341.227489, ActionPPL: 4.947440, WordPPL: 2135.436998
+2021-09-15 15:39:53,881:__main__:INFO: --------------------------------
+2021-09-15 15:39:53,881:__main__:INFO: Starting epoch 14
+2021-09-15 15:39:56,405:__main__:INFO: Epoch: 14, Batch: 3/3, LR: 0.0010, ActionPPL: 4.83, WordPPL: 24.11, PPL: 7.609818, LL: 3657.0494995117188, |Param|: 290.38, E[batch size]: 6.666666666666667, Throughput: 7.92 examples/sec
+2021-09-15 15:39:56,405:__main__:INFO: --------------------------------
+2021-09-15 15:39:56,405:__main__:INFO: Checking validation perplexity...
+2021-09-15 15:39:57,350:__main__:INFO: PPL: 28.885978, Loss: 6498.004349, ActionPPL: 4.711663, WordPPL: 3248.977038
+2021-09-15 15:39:57,351:__main__:INFO: --------------------------------
+2021-09-15 15:39:57,351:__main__:INFO: Starting epoch 15
+2021-09-15 15:39:59,765:__main__:INFO: Epoch: 15, Batch: 3/3, LR: 0.0010, ActionPPL: 4.53, WordPPL: 20.12, PPL: 6.905770, LL: 3482.107940673828, |Param|: 290.46, E[batch size]: 6.666666666666667, Throughput: 8.28 examples/sec
+2021-09-15 15:39:59,766:__main__:INFO: --------------------------------
+2021-09-15 15:39:59,766:__main__:INFO: Checking validation perplexity...
+2021-09-15 15:40:00,701:__main__:INFO: PPL: 29.528701, Loss: 6540.520721, ActionPPL: 4.589868, WordPPL: 3765.468635
+2021-09-15 15:40:00,701:__main__:INFO: --------------------------------
+2021-09-15 15:40:00,702:__main__:INFO: Starting epoch 16
+2021-09-15 15:40:03,261:__main__:INFO: Epoch: 16, Batch: 3/3, LR: 0.0010, ActionPPL: 4.45, WordPPL: 13.90, PPL: 6.143443, LL: 3271.3243103027344, |Param|: 290.53, E[batch size]: 6.666666666666667, Throughput: 7.81 examples/sec
+2021-09-15 15:40:03,262:__main__:INFO: --------------------------------
+2021-09-15 15:40:03,263:__main__:INFO: Checking validation perplexity...
+2021-09-15 15:40:04,208:__main__:INFO: PPL: 28.386263, Loss: 6464.289070, ActionPPL: 4.502997, WordPPL: 3432.935531
+2021-09-15 15:40:04,209:__main__:INFO: --------------------------------
+2021-09-15 15:40:04,209:__main__:INFO: Starting epoch 17
+2021-09-15 15:40:06,580:__main__:INFO: Epoch: 17, Batch: 3/3, LR: 0.0010, ActionPPL: 4.26, WordPPL: 11.49, PPL: 5.637386, LL: 3116.4156494140625, |Param|: 290.61, E[batch size]: 6.666666666666667, Throughput: 8.44 examples/sec
+2021-09-15 15:40:06,581:__main__:INFO: --------------------------------
+2021-09-15 15:40:06,581:__main__:INFO: Checking validation perplexity...
+2021-09-15 15:40:07,525:__main__:INFO: PPL: 37.829689, Loss: 7019.138035, ActionPPL: 4.405084, WordPPL: 10235.256475
+2021-09-15 15:40:07,526:__main__:INFO: --------------------------------
+2021-09-15 15:40:07,526:__main__:INFO: Starting epoch 18
+2021-09-15 15:40:10,426:__main__:INFO: Epoch: 18, Batch: 3/3, LR: 0.0010, ActionPPL: 4.10, WordPPL: 9.16, PPL: 5.147336, LL: 2952.5398559570312, |Param|: 290.68, E[batch size]: 6.666666666666667, Throughput: 6.90 examples/sec
+2021-09-15 15:40:10,426:__main__:INFO: --------------------------------
+2021-09-15 15:40:10,427:__main__:INFO: Checking validation perplexity...
+2021-09-15 15:40:11,361:__main__:INFO: PPL: 35.006909, Loss: 6869.313770, ActionPPL: 4.186528, WordPPL: 8836.145578
+2021-09-15 15:40:11,362:__main__:INFO: --------------------------------
+2021-09-15 15:40:11,363:__main__:INFO: Finished training!
+2021-09-16 02:08:10,177:__main__:INFO: Args: Namespace(amp=False, batch_action_size=45000, batch_group='similar_length', batch_size=32, batch_token_size=15000, composition='lstm', device='cpu', dropout=0.3, early_stop=False, early_stop_patience=5, fixed_stack=True, gpu=0, group_sentence_size=1024, h_dim=256, loss_normalize='batch', lr=0.001, lr_scheduler=None, max_grad_norm=5, max_group_length_diff=20, min_epochs=8, not_swap_in_order_stack=False, num_epochs=18, num_layers=2, optimizer='adam', param_init=0, plateau_lr_decay=0.5, plateau_lr_patience=1, print_every=500, random_unk=False, save_path='rnng.pt', seed=3435, sp_model='', strategy='top_down', tensorboard_log_dir='', train_file='data/ud-train.json', train_from='', val_file='data/ud-val.json', valid_every=-1, w_dim=256, warmup_steps=10000)
+2021-09-16 02:08:10,444:__main__:INFO: Train: 4618 sents / 147 batches, Val: 665 sents / 62 batches
+2021-09-16 02:08:10,444:__main__:INFO: Vocab size: 12306
+2021-09-16 02:08:10,526:__main__:INFO: model architecture
+2021-09-16 02:08:10,527:__main__:INFO: FixedStackRNNG(
+  (action_criterion): CrossEntropyLoss()
+  (word_criterion): CrossEntropyLoss()
+  (dropout): Dropout(p=0.3, inplace=True)
+  (emb): Sequential(
+    (0): Embedding(12306, 256, padding_idx=0)
+    (1): Dropout(p=0.3, inplace=True)
+  )
+  (rnng): RNNGCell(
+    (dropout): Dropout(p=0.3, inplace=True)
+    (nt_emb): Sequential(
+      (0): Embedding(18, 256)
+      (1): Dropout(p=0.3, inplace=True)
+    )
+    (stack_rnn): MultiLayerLSTMCell(
+      (lstm): ModuleList(
+        (0): LSTMCell(256, 256)
+        (1): LSTMCell(256, 256)
+      )
+      (dropout_layer): Dropout(p=0.3, inplace=True)
+    )
+    (output): Sequential(
+      (0): Dropout(p=0.3, inplace=True)
+      (1): Linear(in_features=256, out_features=256, bias=True)
+      (2): ReLU()
+    )
+    (composition): LSTMComposition(
+      (rnn): LSTM(256, 256, batch_first=True, bidirectional=True)
+      (output): Sequential(
+        (0): Dropout(p=0.3, inplace=True)
+        (1): Linear(in_features=512, out_features=256, bias=True)
+        (2): ReLU()
+      )
+    )
+    (initial_emb): Sequential(
+      (0): Embedding(1, 256)
+      (1): Dropout(p=0.3, inplace=True)
+    )
+  )
+  (vocab_mlp): Linear(in_features=256, out_features=12306, bias=True)
+  (action_mlp): Linear(in_features=256, out_features=21, bias=True)
+)
+2021-09-16 02:08:10,533:__main__:INFO: Model total parameters: 5475367
+2021-09-16 02:08:10,533:__main__:INFO: Starting epoch 1
+2021-09-16 02:11:37,725:__main__:INFO: Epoch: 1, Batch: 147/147, LR: 0.0010, ActionPPL: 5.71, WordPPL: 1015.93, PPL: 20.092962, LL: 967979.2349243164, |Param|: 1779.21, E[batch size]: 31.41496598639456, Throughput: 22.29 examples/sec
+2021-09-16 02:11:37,725:__main__:INFO: --------------------------------
+2021-09-16 02:11:37,726:__main__:INFO: Checking validation perplexity...
+2021-09-16 02:11:48,961:__main__:INFO: PPL: 9.026902, Loss: 109099.573730, ActionPPL: 2.819238, WordPPL: 336.882497
+2021-09-16 02:11:48,961:__main__:INFO: --------------------------------
+2021-09-16 02:11:48,962:__main__:INFO: Saving checkpoint to rnng.pt
+2021-09-16 02:11:49,052:__main__:INFO: Starting epoch 2
+2021-09-16 02:15:09,354:__main__:INFO: Epoch: 2, Batch: 147/147, LR: 0.0010, ActionPPL: 2.54, WordPPL: 271.97, PPL: 7.905943, LL: 667053.8907165527, |Param|: 1781.71, E[batch size]: 31.41496598639456, Throughput: 23.06 examples/sec
+2021-09-16 02:15:09,355:__main__:INFO: --------------------------------
+2021-09-16 02:15:09,355:__main__:INFO: Checking validation perplexity...
+2021-09-16 02:15:20,523:__main__:INFO: PPL: 7.137416, Loss: 97453.885567, ActionPPL: 2.275468, WordPPL: 249.853415
+2021-09-16 02:15:20,524:__main__:INFO: --------------------------------
+2021-09-16 02:15:20,524:__main__:INFO: Saving checkpoint to rnng.pt
+2021-09-16 02:15:20,607:__main__:INFO: Starting epoch 3
+2021-09-16 02:18:41,189:__main__:INFO: Epoch: 3, Batch: 147/147, LR: 0.0010, ActionPPL: 2.25, WordPPL: 188.56, PPL: 6.585325, LL: 608088.2590484619, |Param|: 1784.07, E[batch size]: 31.41496598639456, Throughput: 23.02 examples/sec
+2021-09-16 02:18:41,190:__main__:INFO: --------------------------------
+2021-09-16 02:18:41,190:__main__:INFO: Checking validation perplexity...
+2021-09-16 02:18:52,324:__main__:INFO: PPL: 6.585054, Loss: 93459.821922, ActionPPL: 2.115070, WordPPL: 225.237199
+2021-09-16 02:18:52,325:__main__:INFO: --------------------------------
+2021-09-16 02:18:52,325:__main__:INFO: Saving checkpoint to rnng.pt
+2021-09-16 02:18:52,407:__main__:INFO: Starting epoch 4
+2021-09-16 02:22:13,791:__main__:INFO: Epoch: 4, Batch: 147/147, LR: 0.0010, ActionPPL: 2.14, WordPPL: 150.38, PPL: 6.008483, LL: 578513.2589263916, |Param|: 1786.82, E[batch size]: 31.41496598639456, Throughput: 22.93 examples/sec
+2021-09-16 02:22:13,791:__main__:INFO: --------------------------------
+2021-09-16 02:22:13,791:__main__:INFO: Checking validation perplexity...
+2021-09-16 02:22:25,028:__main__:INFO: PPL: 6.370918, Loss: 91820.559275, ActionPPL: 2.067041, WordPPL: 211.180909
+2021-09-16 02:22:25,030:__main__:INFO: --------------------------------
+2021-09-16 02:22:25,030:__main__:INFO: Saving checkpoint to rnng.pt
+2021-09-16 02:22:25,113:__main__:INFO: Starting epoch 5
+2021-09-16 02:25:45,672:__main__:INFO: Epoch: 5, Batch: 147/147, LR: 0.0010, ActionPPL: 2.07, WordPPL: 125.40, PPL: 5.611016, LL: 556432.9496612549, |Param|: 1789.85, E[batch size]: 31.41496598639456, Throughput: 23.03 examples/sec
+2021-09-16 02:25:45,672:__main__:INFO: --------------------------------
+2021-09-16 02:25:45,673:__main__:INFO: Checking validation perplexity...
+2021-09-16 02:25:57,459:__main__:INFO: PPL: 6.267411, Loss: 91008.324949, ActionPPL: 2.027186, WordPPL: 209.755414
+2021-09-16 02:25:57,460:__main__:INFO: --------------------------------
+2021-09-16 02:25:57,460:__main__:INFO: Saving checkpoint to rnng.pt
+2021-09-16 02:25:57,541:__main__:INFO: Starting epoch 6
+2021-09-16 02:29:24,146:__main__:INFO: Epoch: 6, Batch: 147/147, LR: 0.0010, ActionPPL: 2.03, WordPPL: 108.77, PPL: 5.335813, LL: 540208.2587432861, |Param|: 1793.11, E[batch size]: 31.41496598639456, Throughput: 22.35 examples/sec
+2021-09-16 02:29:24,146:__main__:INFO: --------------------------------
+2021-09-16 02:29:24,146:__main__:INFO: Checking validation perplexity...
+2021-09-16 02:29:35,215:__main__:INFO: PPL: 6.183313, Loss: 90338.462402, ActionPPL: 2.008696, WordPPL: 204.162540
+2021-09-16 02:29:35,216:__main__:INFO: --------------------------------
+2021-09-16 02:29:35,217:__main__:INFO: Saving checkpoint to rnng.pt
+2021-09-16 02:29:35,299:__main__:INFO: Starting epoch 7
+2021-09-16 02:33:03,929:__main__:INFO: Epoch: 7, Batch: 147/147, LR: 0.0010, ActionPPL: 2.00, WordPPL: 95.51, PPL: 5.109315, LL: 526214.2758026123, |Param|: 1796.37, E[batch size]: 31.41496598639456, Throughput: 22.13 examples/sec
+2021-09-16 02:33:03,930:__main__:INFO: --------------------------------
+2021-09-16 02:33:03,930:__main__:INFO: Checking validation perplexity...
+2021-09-16 02:33:15,798:__main__:INFO: PPL: 6.179874, Loss: 90310.876299, ActionPPL: 2.012677, WordPPL: 202.445655
+2021-09-16 02:33:15,799:__main__:INFO: --------------------------------
+2021-09-16 02:33:15,799:__main__:INFO: Saving checkpoint to rnng.pt
+2021-09-16 02:33:15,885:__main__:INFO: Starting epoch 8
+2021-09-16 02:36:46,561:__main__:INFO: Epoch: 8, Batch: 147/147, LR: 0.0010, ActionPPL: 1.97, WordPPL: 85.29, PPL: 4.917809, LL: 513889.49488830566, |Param|: 1799.57, E[batch size]: 31.41496598639456, Throughput: 21.92 examples/sec
+2021-09-16 02:36:46,561:__main__:INFO: --------------------------------
+2021-09-16 02:36:46,562:__main__:INFO: Checking validation perplexity...
+2021-09-16 02:36:58,495:__main__:INFO: PPL: 6.122165, Loss: 89845.655212, ActionPPL: 1.980772, WordPPL: 204.712747
+2021-09-16 02:36:58,495:__main__:INFO: --------------------------------
+2021-09-16 02:36:58,496:__main__:INFO: Saving checkpoint to rnng.pt
+2021-09-16 02:36:58,580:__main__:INFO: Starting epoch 9
+2021-09-16 02:40:22,073:__main__:INFO: Epoch: 9, Batch: 147/147, LR: 0.0010, ActionPPL: 1.95, WordPPL: 77.71, PPL: 4.767957, LL: 503905.98014831543, |Param|: 1802.63, E[batch size]: 31.41496598639456, Throughput: 22.69 examples/sec
+2021-09-16 02:40:22,073:__main__:INFO: --------------------------------
+2021-09-16 02:40:22,074:__main__:INFO: Checking validation perplexity...
+2021-09-16 02:40:32,674:__main__:INFO: PPL: 6.101468, Loss: 89677.742018, ActionPPL: 1.969058, WordPPL: 205.641973
+2021-09-16 02:40:32,675:__main__:INFO: --------------------------------
+2021-09-16 02:40:32,675:__main__:INFO: Saving checkpoint to rnng.pt
+2021-09-16 02:40:32,756:__main__:INFO: Starting epoch 10
+2021-09-16 02:43:42,799:__main__:INFO: Epoch: 10, Batch: 147/147, LR: 0.0010, ActionPPL: 1.93, WordPPL: 71.37, PPL: 4.634109, LL: 494719.6587219238, |Param|: 1805.60, E[batch size]: 31.41496598639456, Throughput: 24.30 examples/sec
+2021-09-16 02:43:42,799:__main__:INFO: --------------------------------
+2021-09-16 02:43:42,800:__main__:INFO: Checking validation perplexity...
+2021-09-16 02:43:53,394:__main__:INFO: PPL: 6.098946, Loss: 89657.236568, ActionPPL: 1.967231, WordPPL: 205.886364
+2021-09-16 02:43:53,394:__main__:INFO: --------------------------------
+2021-09-16 02:43:53,395:__main__:INFO: Saving checkpoint to rnng.pt
+2021-09-16 02:43:53,476:__main__:INFO: Starting epoch 11
+2021-09-16 02:47:03,562:__main__:INFO: Epoch: 11, Batch: 147/147, LR: 0.0010, ActionPPL: 1.91, WordPPL: 65.90, PPL: 4.516495, LL: 486425.888092041, |Param|: 1808.46, E[batch size]: 31.41496598639456, Throughput: 24.29 examples/sec
+2021-09-16 02:47:03,563:__main__:INFO: --------------------------------
+2021-09-16 02:47:03,563:__main__:INFO: Checking validation perplexity...
+2021-09-16 02:47:14,121:__main__:INFO: PPL: 6.188484, Loss: 90379.914616, ActionPPL: 1.961855, WordPPL: 220.465094
+2021-09-16 02:47:14,122:__main__:INFO: --------------------------------
+2021-09-16 02:47:14,122:__main__:INFO: Starting epoch 12
+2021-09-16 02:50:25,779:__main__:INFO: Epoch: 12, Batch: 147/147, LR: 0.0010, ActionPPL: 1.89, WordPPL: 61.09, PPL: 4.402970, LL: 478212.9769592285, |Param|: 1811.22, E[batch size]: 31.41496598639456, Throughput: 24.10 examples/sec
+2021-09-16 02:50:25,780:__main__:INFO: --------------------------------
+2021-09-16 02:50:25,780:__main__:INFO: Checking validation perplexity...
+2021-09-16 02:50:36,586:__main__:INFO: PPL: 6.288828, Loss: 91177.486729, ActionPPL: 1.967036, WordPPL: 233.608909
+2021-09-16 02:50:36,586:__main__:INFO: --------------------------------
+2021-09-16 02:50:36,587:__main__:INFO: Starting epoch 13
+2021-09-16 02:53:48,376:__main__:INFO: Epoch: 13, Batch: 147/147, LR: 0.0010, ActionPPL: 1.88, WordPPL: 57.85, PPL: 4.323303, LL: 472322.0117034912, |Param|: 1813.81, E[batch size]: 31.41496598639456, Throughput: 24.08 examples/sec
+2021-09-16 02:53:48,377:__main__:INFO: --------------------------------
+2021-09-16 02:53:48,377:__main__:INFO: Checking validation perplexity...
+2021-09-16 02:53:59,008:__main__:INFO: PPL: 6.258025, Loss: 90934.009743, ActionPPL: 1.962211, WordPPL: 230.696984
+2021-09-16 02:53:59,009:__main__:INFO: --------------------------------
+2021-09-16 02:53:59,009:__main__:INFO: Starting epoch 14
+2021-09-16 02:57:11,597:__main__:INFO: Epoch: 14, Batch: 147/147, LR: 0.0010, ActionPPL: 1.87, WordPPL: 54.11, PPL: 4.227440, LL: 465087.89923095703, |Param|: 1816.33, E[batch size]: 31.41496598639456, Throughput: 23.98 examples/sec
+2021-09-16 02:57:11,597:__main__:INFO: --------------------------------
+2021-09-16 02:57:11,598:__main__:INFO: Checking validation perplexity...
+2021-09-16 02:57:22,132:__main__:INFO: PPL: 6.327289, Loss: 91479.814447, ActionPPL: 1.951730, WordPPL: 245.428169
+2021-09-16 02:57:22,133:__main__:INFO: --------------------------------
+2021-09-16 02:57:22,133:__main__:INFO: Starting epoch 15
+2021-09-16 03:00:36,553:__main__:INFO: Epoch: 15, Batch: 147/147, LR: 0.0010, ActionPPL: 1.86, WordPPL: 50.81, PPL: 4.145675, LL: 458786.77911376953, |Param|: 1818.74, E[batch size]: 31.41496598639456, Throughput: 23.75 examples/sec
+2021-09-16 03:00:36,553:__main__:INFO: --------------------------------
+2021-09-16 03:00:36,554:__main__:INFO: Checking validation perplexity...
+2021-09-16 03:00:47,149:__main__:INFO: PPL: 6.396360, Loss: 92018.179540, ActionPPL: 1.959763, WordPPL: 253.371256
+2021-09-16 03:00:47,150:__main__:INFO: --------------------------------
+2021-09-16 03:00:47,150:__main__:INFO: Starting epoch 16
+2021-09-16 03:04:01,188:__main__:INFO: Epoch: 16, Batch: 147/147, LR: 0.0010, ActionPPL: 1.84, WordPPL: 48.18, PPL: 4.073199, LL: 453096.7712402344, |Param|: 1821.02, E[batch size]: 31.41496598639456, Throughput: 23.80 examples/sec
+2021-09-16 03:04:01,189:__main__:INFO: --------------------------------
+2021-09-16 03:04:01,189:__main__:INFO: Checking validation perplexity...
+2021-09-16 03:04:11,843:__main__:INFO: PPL: 6.513530, Loss: 92918.291239, ActionPPL: 1.973878, WordPPL: 266.972330
+2021-09-16 03:04:11,843:__main__:INFO: --------------------------------
+2021-09-16 03:04:11,843:__main__:INFO: Starting epoch 17
+2021-09-16 03:07:26,128:__main__:INFO: Epoch: 17, Batch: 147/147, LR: 0.0010, ActionPPL: 1.83, WordPPL: 45.88, PPL: 4.004656, LL: 447621.5629272461, |Param|: 1823.23, E[batch size]: 31.41496598639456, Throughput: 23.77 examples/sec
+2021-09-16 03:07:26,129:__main__:INFO: --------------------------------
+2021-09-16 03:07:26,129:__main__:INFO: Checking validation perplexity...
+2021-09-16 03:07:36,688:__main__:INFO: PPL: 6.602963, Loss: 93594.489771, ActionPPL: 1.981391, WordPPL: 279.047270
+2021-09-16 03:07:36,689:__main__:INFO: --------------------------------
+2021-09-16 03:07:36,689:__main__:INFO: Starting epoch 18
+2021-09-16 13:12:28,609:__main__:INFO: Args: Namespace(amp=False, batch_action_size=45000, batch_group='similar_length', batch_size=512, batch_token_size=15000, composition='lstm', device='cpu', dropout=0.3, early_stop=False, early_stop_patience=5, fixed_stack=True, gpu=0, group_sentence_size=1024, h_dim=256, loss_normalize='batch', lr=0.001, lr_scheduler=None, max_grad_norm=5, max_group_length_diff=20, min_epochs=8, not_swap_in_order_stack=False, num_epochs=18, num_layers=2, optimizer='adam', param_init=0, plateau_lr_decay=0.5, plateau_lr_patience=1, print_every=500, random_unk=False, save_path='rnng.pt', seed=3435, sp_model='', strategy='top_down', tensorboard_log_dir='', train_file='data/ud-train.json', train_from='', val_file='data/ud-val.json', valid_every=-1, w_dim=256, warmup_steps=10000)
+2021-09-16 13:12:29,218:__main__:INFO: Train: 4618 sents / 12 batches, Val: 665 sents / 61 batches
+2021-09-16 13:12:29,219:__main__:INFO: Vocab size: 12306
+2021-09-16 13:12:29,300:__main__:INFO: model architecture
+2021-09-16 13:12:29,301:__main__:INFO: FixedStackRNNG(
+  (action_criterion): CrossEntropyLoss()
+  (word_criterion): CrossEntropyLoss()
+  (dropout): Dropout(p=0.3, inplace=True)
+  (emb): Sequential(
+    (0): Embedding(12306, 256, padding_idx=0)
+    (1): Dropout(p=0.3, inplace=True)
+  )
+  (rnng): RNNGCell(
+    (dropout): Dropout(p=0.3, inplace=True)
+    (nt_emb): Sequential(
+      (0): Embedding(18, 256)
+      (1): Dropout(p=0.3, inplace=True)
+    )
+    (stack_rnn): MultiLayerLSTMCell(
+      (lstm): ModuleList(
+        (0): LSTMCell(256, 256)
+        (1): LSTMCell(256, 256)
+      )
+      (dropout_layer): Dropout(p=0.3, inplace=True)
+    )
+    (output): Sequential(
+      (0): Dropout(p=0.3, inplace=True)
+      (1): Linear(in_features=256, out_features=256, bias=True)
+      (2): ReLU()
+    )
+    (composition): LSTMComposition(
+      (rnn): LSTM(256, 256, batch_first=True, bidirectional=True)
+      (output): Sequential(
+        (0): Dropout(p=0.3, inplace=True)
+        (1): Linear(in_features=512, out_features=256, bias=True)
+        (2): ReLU()
+      )
+    )
+    (initial_emb): Sequential(
+      (0): Embedding(1, 256)
+      (1): Dropout(p=0.3, inplace=True)
+    )
+  )
+  (vocab_mlp): Linear(in_features=256, out_features=12306, bias=True)
+  (action_mlp): Linear(in_features=256, out_features=21, bias=True)
+)
+2021-09-16 13:12:29,307:__main__:INFO: Model total parameters: 5475367
+2021-09-16 13:12:29,308:__main__:INFO: Starting epoch 1
+2021-09-16 13:16:49,323:__main__:INFO: Epoch: 1, Batch: 14/14, LR: 0.0010, ActionPPL: 18.57, WordPPL: 4807.17, PPL: 71.581455, LL: 1377857.1186523438, |Param|: 1776.92, E[batch size]: 329.85714285714283, Throughput: 17.76 examples/sec
+2021-09-16 13:16:49,323:__main__:INFO: --------------------------------
+2021-09-16 13:16:49,324:__main__:INFO: Checking validation perplexity...
+2021-09-16 13:17:06,559:__main__:INFO: PPL: 49.123985, Loss: 193105.110779, ActionPPL: 16.188288, WordPPL: 1551.386796
+2021-09-16 13:17:06,560:__main__:INFO: --------------------------------
+2021-09-16 13:17:06,561:__main__:INFO: Saving checkpoint to rnng.pt
+2021-09-16 13:17:06,670:__main__:INFO: Starting epoch 2
+2021-09-16 13:19:53,183:__main__:INFO: Epoch: 2, Batch: 14/14, LR: 0.0010, ActionPPL: 11.61, WordPPL: 1904.58, PPL: 40.073962, LL: 1190702.2758789062, |Param|: 1776.59, E[batch size]: 329.85714285714283, Throughput: 27.73 examples/sec
+2021-09-16 13:19:53,183:__main__:INFO: --------------------------------
+2021-09-16 13:19:53,183:__main__:INFO: Checking validation perplexity...
+2021-09-16 13:20:04,177:__main__:INFO: PPL: 27.884931, Loss: 165026.493210, ActionPPL: 7.774109, WordPPL: 1481.431733
+2021-09-16 13:20:04,178:__main__:INFO: --------------------------------
+2021-09-16 13:20:04,178:__main__:INFO: Saving checkpoint to rnng.pt
+2021-09-16 13:20:04,259:__main__:INFO: Starting epoch 3
+2021-09-16 13:22:42,335:__main__:INFO: Epoch: 3, Batch: 14/14, LR: 0.0010, ActionPPL: 6.99, WordPPL: 1198.04, PPL: 24.375309, LL: 1030309.7807617188, |Param|: 1776.22, E[batch size]: 329.85714285714283, Throughput: 29.21 examples/sec
+2021-09-16 13:22:42,336:__main__:INFO: --------------------------------
+2021-09-16 13:22:42,336:__main__:INFO: Checking validation perplexity...
+2021-09-16 13:22:52,723:__main__:INFO: PPL: 19.334785, Loss: 146869.060448, ActionPPL: 5.938688, WordPPL: 759.981420
+2021-09-16 13:22:52,724:__main__:INFO: --------------------------------
+2021-09-16 13:22:52,725:__main__:INFO: Saving checkpoint to rnng.pt
+2021-09-16 13:22:52,809:__main__:INFO: Starting epoch 4
+2021-09-16 13:25:30,022:__main__:INFO: Epoch: 4, Batch: 14/14, LR: 0.0010, ActionPPL: 5.39, WordPPL: 758.96, PPL: 17.932188, LL: 931274.0275878906, |Param|: 1775.79, E[batch size]: 329.85714285714283, Throughput: 29.37 examples/sec
+2021-09-16 13:25:30,023:__main__:INFO: --------------------------------
+2021-09-16 13:25:30,023:__main__:INFO: Checking validation perplexity...
+2021-09-16 13:25:40,325:__main__:INFO: PPL: 14.609087, Loss: 132971.985718, ActionPPL: 4.604544, WordPPL: 529.923712
+2021-09-16 13:25:40,326:__main__:INFO: --------------------------------
+2021-09-16 13:25:40,326:__main__:INFO: Saving checkpoint to rnng.pt
+2021-09-16 13:25:40,408:__main__:INFO: Starting epoch 5
+2021-09-16 13:28:15,944:__main__:INFO: Epoch: 5, Batch: 14/14, LR: 0.0010, ActionPPL: 4.31, WordPPL: 565.69, PPL: 14.091750, LL: 853520.0979003906, |Param|: 1775.39, E[batch size]: 329.85714285714283, Throughput: 29.69 examples/sec
+2021-09-16 13:28:15,944:__main__:INFO: --------------------------------
+2021-09-16 13:28:15,944:__main__:INFO: Checking validation perplexity...
+2021-09-16 13:28:26,210:__main__:INFO: PPL: 12.280552, Loss: 124362.524101, ActionPPL: 3.884885, WordPPL: 440.394615
+2021-09-16 13:28:26,211:__main__:INFO: --------------------------------
+2021-09-16 13:28:26,211:__main__:INFO: Saving checkpoint to rnng.pt
+2021-09-16 13:28:26,327:__main__:INFO: Starting epoch 6
+2021-09-16 13:30:58,174:__main__:INFO: Epoch: 6, Batch: 14/14, LR: 0.0010, ActionPPL: 3.66, WordPPL: 457.67, PPL: 11.822870, LL: 796882.9400634766, |Param|: 1774.94, E[batch size]: 329.85714285714283, Throughput: 30.41 examples/sec
+2021-09-16 13:30:58,175:__main__:INFO: --------------------------------
+2021-09-16 13:30:58,175:__main__:INFO: Checking validation perplexity...
+2021-09-16 13:31:08,503:__main__:INFO: PPL: 10.339345, Loss: 115830.739815, ActionPPL: 3.266228, WordPPL: 372.395503
+2021-09-16 13:31:08,504:__main__:INFO: --------------------------------
+2021-09-16 13:31:08,504:__main__:INFO: Saving checkpoint to rnng.pt
+2021-09-16 13:31:08,587:__main__:INFO: Starting epoch 7
+2021-09-16 13:33:49,897:__main__:INFO: Epoch: 7, Batch: 14/14, LR: 0.0010, ActionPPL: 3.16, WordPPL: 368.87, PPL: 10.048004, LL: 744405.0151367188, |Param|: 1774.59, E[batch size]: 329.85714285714283, Throughput: 28.63 examples/sec
+2021-09-16 13:33:49,897:__main__:INFO: --------------------------------
+2021-09-16 13:33:49,898:__main__:INFO: Checking validation perplexity...
+2021-09-16 13:34:00,710:__main__:INFO: PPL: 9.314101, Loss: 110652.622063, ActionPPL: 2.925957, WordPPL: 341.349644
+2021-09-16 13:34:00,710:__main__:INFO: --------------------------------
+2021-09-16 13:34:00,711:__main__:INFO: Saving checkpoint to rnng.pt
+2021-09-16 13:34:00,799:__main__:INFO: Starting epoch 8
+2021-09-16 13:36:50,571:__main__:INFO: Epoch: 8, Batch: 14/14, LR: 0.0010, ActionPPL: 2.91, WordPPL: 315.64, PPL: 9.081666, LL: 711782.8447265625, |Param|: 1774.30, E[batch size]: 329.85714285714283, Throughput: 27.20 examples/sec
+2021-09-16 13:36:50,572:__main__:INFO: --------------------------------
+2021-09-16 13:36:50,572:__main__:INFO: Checking validation perplexity...
+2021-09-16 13:37:02,018:__main__:INFO: PPL: 8.641029, Loss: 106933.281853, ActionPPL: 2.750503, WordPPL: 303.972463
+2021-09-16 13:37:02,019:__main__:INFO: --------------------------------
+2021-09-16 13:37:02,020:__main__:INFO: Saving checkpoint to rnng.pt
+2021-09-16 13:37:02,099:__main__:INFO: Starting epoch 9
+2021-09-16 13:39:51,030:__main__:INFO: Epoch: 9, Batch: 14/14, LR: 0.0010, ActionPPL: 2.73, WordPPL: 268.40, PPL: 8.316019, LL: 683368.4177246094, |Param|: 1774.01, E[batch size]: 329.85714285714283, Throughput: 27.34 examples/sec
+2021-09-16 13:39:51,031:__main__:INFO: --------------------------------
+2021-09-16 13:39:51,031:__main__:INFO: Checking validation perplexity...
+2021-09-16 13:40:03,125:__main__:INFO: PPL: 8.050530, Loss: 103423.402214, ActionPPL: 2.570375, WordPPL: 280.524701
+2021-09-16 13:40:03,136:__main__:INFO: --------------------------------
+2021-09-16 13:40:03,136:__main__:INFO: Saving checkpoint to rnng.pt
+2021-09-16 13:40:03,222:__main__:INFO: Starting epoch 10
+2021-09-16 13:43:32,234:__main__:INFO: Epoch: 10, Batch: 14/14, LR: 0.0010, ActionPPL: 2.60, WordPPL: 241.86, PPL: 7.818589, LL: 663469.3680419922, |Param|: 1773.75, E[batch size]: 329.85714285714283, Throughput: 22.09 examples/sec
+2021-09-16 13:43:32,235:__main__:INFO: --------------------------------
+2021-09-16 13:43:32,236:__main__:INFO: Checking validation perplexity...
+2021-09-16 13:43:44,507:__main__:INFO: PPL: 7.673649, Loss: 101045.965000, ActionPPL: 2.446289, WordPPL: 268.671023
+2021-09-16 13:43:44,508:__main__:INFO: --------------------------------
+2021-09-16 13:43:44,509:__main__:INFO: Saving checkpoint to rnng.pt
+2021-09-16 13:43:44,591:__main__:INFO: Starting epoch 11
+2021-09-16 13:46:39,925:__main__:INFO: Epoch: 11, Batch: 14/14, LR: 0.0010, ActionPPL: 2.50, WordPPL: 220.55, PPL: 7.420011, LL: 646588.7243652344, |Param|: 1773.54, E[batch size]: 329.85714285714283, Throughput: 26.34 examples/sec
+2021-09-16 13:46:39,926:__main__:INFO: --------------------------------
+2021-09-16 13:46:39,926:__main__:INFO: Checking validation perplexity...
+2021-09-16 13:46:54,086:__main__:INFO: PPL: 7.445672, Loss: 99550.483265, ActionPPL: 2.373748, WordPPL: 260.642542
+2021-09-16 13:46:54,087:__main__:INFO: --------------------------------
+2021-09-16 13:46:54,087:__main__:INFO: Saving checkpoint to rnng.pt
+2021-09-16 13:46:54,176:__main__:INFO: Starting epoch 12
+2021-09-16 13:50:09,243:__main__:INFO: Epoch: 12, Batch: 14/14, LR: 0.0010, ActionPPL: 2.43, WordPPL: 203.04, PPL: 7.109099, LL: 632778.9465332031, |Param|: 1773.36, E[batch size]: 329.85714285714283, Throughput: 23.67 examples/sec
+2021-09-16 13:50:09,243:__main__:INFO: --------------------------------
+2021-09-16 13:50:09,244:__main__:INFO: Checking validation perplexity...
+2021-09-16 13:50:24,442:__main__:INFO: PPL: 7.210497, Loss: 97959.018391, ActionPPL: 2.333912, WordPPL: 240.776671
+2021-09-16 13:50:24,443:__main__:INFO: --------------------------------
+2021-09-16 13:50:24,443:__main__:INFO: Saving checkpoint to rnng.pt
+2021-09-16 13:50:24,530:__main__:INFO: Starting epoch 13
+2021-09-16 13:53:33,696:__main__:INFO: Epoch: 13, Batch: 14/14, LR: 0.0010, ActionPPL: 2.40, WordPPL: 191.94, PPL: 6.959144, LL: 625901.0275878906, |Param|: 1773.20, E[batch size]: 329.85714285714283, Throughput: 24.41 examples/sec
+2021-09-16 13:53:33,697:__main__:INFO: --------------------------------
+2021-09-16 13:53:33,697:__main__:INFO: Checking validation perplexity...
+2021-09-16 13:53:48,288:__main__:INFO: PPL: 7.121367, Loss: 97342.260155, ActionPPL: 2.289001, WordPPL: 243.028546
+2021-09-16 13:53:48,289:__main__:INFO: --------------------------------
+2021-09-16 13:53:48,290:__main__:INFO: Saving checkpoint to rnng.pt
+2021-09-16 13:53:48,378:__main__:INFO: Starting epoch 14
+2021-09-16 13:56:50,577:__main__:INFO: Epoch: 14, Batch: 14/14, LR: 0.0010, ActionPPL: 2.32, WordPPL: 178.89, PPL: 6.663671, LL: 611903.8394775391, |Param|: 1773.08, E[batch size]: 329.85714285714283, Throughput: 25.35 examples/sec
+2021-09-16 13:56:50,578:__main__:INFO: --------------------------------
+2021-09-16 13:56:50,578:__main__:INFO: Checking validation perplexity...
+2021-09-16 13:57:05,170:__main__:INFO: PPL: 6.989914, Loss: 96418.404030, ActionPPL: 2.246353, WordPPL: 238.673287
+2021-09-16 13:57:05,170:__main__:INFO: --------------------------------
+2021-09-16 13:57:05,171:__main__:INFO: Saving checkpoint to rnng.pt
+2021-09-16 13:57:05,263:__main__:INFO: Starting epoch 15
+2021-09-16 14:00:05,547:__main__:INFO: Epoch: 15, Batch: 14/14, LR: 0.0010, ActionPPL: 2.28, WordPPL: 166.06, PPL: 6.452655, LL: 601522.319519043, |Param|: 1773.00, E[batch size]: 329.85714285714283, Throughput: 25.62 examples/sec
+2021-09-16 14:00:05,548:__main__:INFO: --------------------------------
+2021-09-16 14:00:05,548:__main__:INFO: Checking validation perplexity...
+2021-09-16 14:00:19,078:__main__:INFO: PPL: 6.821223, Loss: 95207.040421, ActionPPL: 2.187061, WordPPL: 234.599850
+2021-09-16 14:00:19,079:__main__:INFO: --------------------------------
+2021-09-16 14:00:19,080:__main__:INFO: Saving checkpoint to rnng.pt
+2021-09-16 14:00:19,163:__main__:INFO: Starting epoch 16
+2021-09-16 14:03:21,110:__main__:INFO: Epoch: 16, Batch: 14/14, LR: 0.0010, ActionPPL: 2.23, WordPPL: 159.14, PPL: 6.285117, LL: 593035.0513305664, |Param|: 1772.93, E[batch size]: 329.85714285714283, Throughput: 25.38 examples/sec
+2021-09-16 14:03:21,111:__main__:INFO: --------------------------------
+2021-09-16 14:03:21,111:__main__:INFO: Checking validation perplexity...
+2021-09-16 14:03:35,765:__main__:INFO: PPL: 6.706922, Loss: 94369.106030, ActionPPL: 2.164413, WordPPL: 226.059824
+2021-09-16 14:03:35,766:__main__:INFO: --------------------------------
+2021-09-16 14:03:35,767:__main__:INFO: Saving checkpoint to rnng.pt
+2021-09-16 14:03:35,851:__main__:INFO: Starting epoch 17
+2021-09-16 14:06:41,110:__main__:INFO: Epoch: 17, Batch: 14/14, LR: 0.0010, ActionPPL: 2.20, WordPPL: 148.67, PPL: 6.122451, LL: 584575.3461914062, |Param|: 1772.90, E[batch size]: 329.85714285714283, Throughput: 24.93 examples/sec
+2021-09-16 14:06:41,111:__main__:INFO: --------------------------------
+2021-09-16 14:06:41,111:__main__:INFO: Checking validation perplexity...
+2021-09-16 14:06:55,890:__main__:INFO: PPL: 6.668216, Loss: 94082.115398, ActionPPL: 2.144453, WordPPL: 227.198903
+2021-09-16 14:06:55,891:__main__:INFO: --------------------------------
+2021-09-16 14:06:55,892:__main__:INFO: Saving checkpoint to rnng.pt
+2021-09-16 14:06:55,984:__main__:INFO: Starting epoch 18
+2021-09-16 14:10:00,025:__main__:INFO: Epoch: 18, Batch: 14/14, LR: 0.0010, ActionPPL: 2.18, WordPPL: 140.20, PPL: 5.983858, LL: 577188.3406982422, |Param|: 1772.89, E[batch size]: 329.85714285714283, Throughput: 25.09 examples/sec
+2021-09-16 14:10:00,032:__main__:INFO: --------------------------------
+2021-09-16 14:10:00,032:__main__:INFO: Checking validation perplexity...
+2021-09-16 14:10:14,384:__main__:INFO: PPL: 6.614225, Loss: 93678.995529, ActionPPL: 2.106065, WordPPL: 232.430738
+2021-09-16 14:10:14,385:__main__:INFO: --------------------------------
+2021-09-16 14:10:14,385:__main__:INFO: Saving checkpoint to rnng.pt
+2021-09-16 14:10:14,477:__main__:INFO: Finished training!
+2021-10-15 02:02:59,918:__main__:INFO: Args: Namespace(train_file='data/ud-train.json', val_file='data/ud-val.json', train_from='', sp_model='', fixed_stack=True, strategy='top_down', w_dim=256, h_dim=256, num_layers=2, dropout=0.3, composition='lstm', not_swap_in_order_stack=False, batch_group='similar_length', max_group_length_diff=20, group_sentence_size=1024, optimizer='adam', lr_scheduler=None, plateau_lr_decay=0.5, plateau_lr_patience=1, warmup_steps=10000, random_unk=False, batch_size=512, batch_token_size=15000, batch_action_size=45000, save_path='rnng.pt', num_epochs=18, min_epochs=8, lr=0.001, loss_normalize='batch', param_init=0, max_grad_norm=5, gpu=0, device='cuda', seed=3435, print_every=500, valid_every=-1, tensorboard_log_dir='', amp=False, early_stop=False, early_stop_patience=5)
+2021-10-15 02:03:00,160:__main__:INFO: Train: 5393 sents / 13 batches, Val: 793 sents / 59 batches
+2021-10-15 02:03:00,160:__main__:INFO: Vocab size: 6200
+2021-10-15 02:03:01,980:__main__:INFO: model architecture
+2021-10-15 02:03:01,980:__main__:INFO: FixedStackRNNG(
+  (action_criterion): CrossEntropyLoss()
+  (word_criterion): CrossEntropyLoss()
+  (dropout): Dropout(p=0.3, inplace=True)
+  (emb): Sequential(
+    (0): Embedding(6200, 256, padding_idx=0)
+    (1): Dropout(p=0.3, inplace=True)
+  )
+  (rnng): RNNGCell(
+    (dropout): Dropout(p=0.3, inplace=True)
+    (nt_emb): Sequential(
+      (0): Embedding(18, 256)
+      (1): Dropout(p=0.3, inplace=True)
+    )
+    (stack_rnn): MultiLayerLSTMCell(
+      (lstm): ModuleList(
+        (0): LSTMCell(256, 256)
+        (1): LSTMCell(256, 256)
+      )
+      (dropout_layer): Dropout(p=0.3, inplace=True)
+    )
+    (output): Sequential(
+      (0): Dropout(p=0.3, inplace=True)
+      (1): Linear(in_features=256, out_features=256, bias=True)
+      (2): ReLU()
+    )
+    (composition): LSTMComposition(
+      (rnn): LSTM(256, 256, batch_first=True, bidirectional=True)
+      (output): Sequential(
+        (0): Dropout(p=0.3, inplace=True)
+        (1): Linear(in_features=512, out_features=256, bias=True)
+        (2): ReLU()
+      )
+    )
+    (initial_emb): Sequential(
+      (0): Embedding(1, 256)
+      (1): Dropout(p=0.3, inplace=True)
+    )
+  )
+  (vocab_mlp): Linear(in_features=256, out_features=6200, bias=True)
+  (action_mlp): Linear(in_features=256, out_features=21, bias=True)
+)
+2021-10-15 02:03:01,981:__main__:INFO: Model total parameters: 3906125
+2021-10-15 02:03:01,981:__main__:INFO: Starting epoch 1
+2021-10-15 02:03:13,799:__main__:INFO: Epoch: 1, Batch: 14/14, LR: 0.0010, ActionPPL: 18.25, WordPPL: 2848.23, PPL: 62.274896, LL: 1599169.251953125, |Param|: 1262.00, E[batch size]: 385.2142857142857, Throughput: 456.34 examples/sec
+2021-10-15 02:03:13,799:__main__:INFO: --------------------------------
+2021-10-15 02:03:13,800:__main__:INFO: Checking validation perplexity...
+2021-10-15 02:03:23,215:__main__:INFO: PPL: 38.894751, Loss: 213757.574326, ActionPPL: 15.052360, WordPPL: 746.096951
+2021-10-15 02:03:23,216:__main__:INFO: --------------------------------
+2021-10-15 02:03:23,216:__main__:INFO: Saving checkpoint to rnng.pt
+2021-10-15 02:03:23,278:__main__:INFO: Starting epoch 2
+2021-10-15 02:03:33,346:__main__:INFO: Epoch: 2, Batch: 14/14, LR: 0.0010, ActionPPL: 11.45, WordPPL: 1100.08, PPL: 34.718824, LL: 1373018.068359375, |Param|: 1261.74, E[batch size]: 385.2142857142857, Throughput: 535.68 examples/sec
+2021-10-15 02:03:33,346:__main__:INFO: --------------------------------
+2021-10-15 02:03:33,346:__main__:INFO: Checking validation perplexity...
+2021-10-15 02:03:42,786:__main__:INFO: PPL: 22.943946, Loss: 182939.029114, ActionPPL: 8.676427, WordPPL: 472.951038
+2021-10-15 02:03:42,787:__main__:INFO: --------------------------------
+2021-10-15 02:03:42,787:__main__:INFO: Saving checkpoint to rnng.pt
+2021-10-15 02:03:42,844:__main__:INFO: Starting epoch 3
+2021-10-15 02:03:52,878:__main__:INFO: Epoch: 3, Batch: 14/14, LR: 0.0010, ActionPPL: 7.33, WordPPL: 634.28, PPL: 21.671154, LL: 1190595.7651367188, |Param|: 1261.44, E[batch size]: 385.2142857142857, Throughput: 537.49 examples/sec
+2021-10-15 02:03:52,880:__main__:INFO: --------------------------------
+2021-10-15 02:03:52,881:__main__:INFO: Checking validation perplexity...
+2021-10-15 02:04:02,391:__main__:INFO: PPL: 14.741065, Loss: 157106.302864, ActionPPL: 5.921124, WordPPL: 251.850606
+2021-10-15 02:04:02,391:__main__:INFO: --------------------------------
+2021-10-15 02:04:02,391:__main__:INFO: Saving checkpoint to rnng.pt
+2021-10-15 02:04:02,448:__main__:INFO: Starting epoch 4
+2021-10-15 02:04:12,471:__main__:INFO: Epoch: 4, Batch: 14/14, LR: 0.0010, ActionPPL: 5.49, WordPPL: 382.23, PPL: 15.390048, LL: 1058119.5366210938, |Param|: 1261.09, E[batch size]: 385.2142857142857, Throughput: 538.08 examples/sec
+2021-10-15 02:04:12,471:__main__:INFO: --------------------------------
+2021-10-15 02:04:12,472:__main__:INFO: Checking validation perplexity...
+2021-10-15 02:04:22,065:__main__:INFO: PPL: 11.396442, Loss: 142080.458496, ActionPPL: 4.811273, WordPPL: 166.772017
+2021-10-15 02:04:22,065:__main__:INFO: --------------------------------
+2021-10-15 02:04:22,067:__main__:INFO: Saving checkpoint to rnng.pt
+2021-10-15 02:04:22,123:__main__:INFO: Starting epoch 5
+2021-10-15 02:04:32,160:__main__:INFO: Epoch: 5, Batch: 14/14, LR: 0.0010, ActionPPL: 4.47, WordPPL: 264.07, PPL: 12.052812, LL: 963512.6713867188, |Param|: 1260.69, E[batch size]: 385.2142857142857, Throughput: 537.30 examples/sec
+2021-10-15 02:04:32,160:__main__:INFO: --------------------------------
+2021-10-15 02:04:32,160:__main__:INFO: Checking validation perplexity...
+2021-10-15 02:04:41,659:__main__:INFO: PPL: 8.991807, Loss: 128242.762436, ActionPPL: 3.864205, WordPPL: 124.500480
+2021-10-15 02:04:41,660:__main__:INFO: --------------------------------
+2021-10-15 02:04:41,660:__main__:INFO: Saving checkpoint to rnng.pt
+2021-10-15 02:04:41,717:__main__:INFO: Starting epoch 6
+2021-10-15 02:04:51,737:__main__:INFO: Epoch: 6, Batch: 14/14, LR: 0.0010, ActionPPL: 3.67, WordPPL: 213.47, PPL: 9.857974, LL: 885706.5068359375, |Param|: 1260.33, E[batch size]: 385.2142857142857, Throughput: 538.24 examples/sec
+2021-10-15 02:04:51,737:__main__:INFO: --------------------------------
+2021-10-15 02:04:51,738:__main__:INFO: Checking validation perplexity...
+2021-10-15 02:05:01,195:__main__:INFO: PPL: 7.510596, Loss: 117732.620987, ActionPPL: 3.269653, WordPPL: 99.891631
+2021-10-15 02:05:01,195:__main__:INFO: --------------------------------
+2021-10-15 02:05:01,196:__main__:INFO: Saving checkpoint to rnng.pt
+2021-10-15 02:05:01,253:__main__:INFO: Starting epoch 7
+2021-10-15 02:05:11,249:__main__:INFO: Epoch: 7, Batch: 14/14, LR: 0.0010, ActionPPL: 3.18, WordPPL: 178.51, PPL: 8.462239, LL: 826614.9399414062, |Param|: 1259.99, E[batch size]: 385.2142857142857, Throughput: 539.54 examples/sec
+2021-10-15 02:05:11,249:__main__:INFO: --------------------------------
+2021-10-15 02:05:11,250:__main__:INFO: Checking validation perplexity...
+2021-10-15 02:05:20,738:__main__:INFO: PPL: 6.658255, Loss: 110699.118309, ActionPPL: 2.898031, WordPPL: 88.609160
+2021-10-15 02:05:20,738:__main__:INFO: --------------------------------
+2021-10-15 02:05:20,739:__main__:INFO: Saving checkpoint to rnng.pt
+2021-10-15 02:05:20,796:__main__:INFO: Starting epoch 8
+2021-10-15 02:05:30,822:__main__:INFO: Epoch: 8, Batch: 14/14, LR: 0.0010, ActionPPL: 2.88, WordPPL: 154.15, PPL: 7.570931, LL: 783535.8249511719, |Param|: 1259.67, E[batch size]: 385.2142857142857, Throughput: 537.92 examples/sec
+2021-10-15 02:05:30,822:__main__:INFO: --------------------------------
+2021-10-15 02:05:30,823:__main__:INFO: Checking validation perplexity...
+2021-10-15 02:05:40,331:__main__:INFO: PPL: 6.108223, Loss: 105664.642796, ActionPPL: 2.684225, WordPPL: 78.901303
+2021-10-15 02:05:40,331:__main__:INFO: --------------------------------
+2021-10-15 02:05:40,332:__main__:INFO: Saving checkpoint to rnng.pt
+2021-10-15 02:05:40,390:__main__:INFO: Starting epoch 9
+2021-10-15 02:05:50,408:__main__:INFO: Epoch: 9, Batch: 14/14, LR: 0.0010, ActionPPL: 2.69, WordPPL: 138.94, PPL: 7.017309, LL: 754143.7685546875, |Param|: 1259.37, E[batch size]: 385.2142857142857, Throughput: 538.29 examples/sec
+2021-10-15 02:05:50,408:__main__:INFO: --------------------------------
+2021-10-15 02:05:50,409:__main__:INFO: Checking validation perplexity...
+2021-10-15 02:05:59,811:__main__:INFO: PPL: 5.735917, Loss: 101992.598915, ActionPPL: 2.549536, WordPPL: 71.508216
+2021-10-15 02:05:59,811:__main__:INFO: --------------------------------
+2021-10-15 02:05:59,812:__main__:INFO: Saving checkpoint to rnng.pt
+2021-10-15 02:05:59,869:__main__:INFO: Starting epoch 10
+2021-10-15 02:06:09,927:__main__:INFO: Epoch: 10, Batch: 14/14, LR: 0.0010, ActionPPL: 2.56, WordPPL: 122.04, PPL: 6.539521, LL: 726849.7685546875, |Param|: 1259.10, E[batch size]: 385.2142857142857, Throughput: 536.19 examples/sec
+2021-10-15 02:06:09,927:__main__:INFO: --------------------------------
+2021-10-15 02:06:09,928:__main__:INFO: Checking validation perplexity...
+2021-10-15 02:06:19,389:__main__:INFO: PPL: 5.382384, Loss: 98278.047192, ActionPPL: 2.415195, WordPPL: 65.149351
+2021-10-15 02:06:19,390:__main__:INFO: --------------------------------
+2021-10-15 02:06:19,390:__main__:INFO: Saving checkpoint to rnng.pt
+2021-10-15 02:06:19,447:__main__:INFO: Starting epoch 11
+2021-10-15 02:06:29,546:__main__:INFO: Epoch: 11, Batch: 14/14, LR: 0.0010, ActionPPL: 2.46, WordPPL: 110.73, PPL: 6.200036, LL: 706215.9333496094, |Param|: 1258.88, E[batch size]: 385.2142857142857, Throughput: 534.05 examples/sec
+2021-10-15 02:06:29,546:__main__:INFO: --------------------------------
+2021-10-15 02:06:29,547:__main__:INFO: Checking validation perplexity...
+2021-10-15 02:06:39,040:__main__:INFO: PPL: 5.167382, Loss: 95897.763149, ActionPPL: 2.341610, WordPPL: 60.663898
+2021-10-15 02:06:39,041:__main__:INFO: --------------------------------
+2021-10-15 02:06:39,041:__main__:INFO: Saving checkpoint to rnng.pt
+2021-10-15 02:06:39,097:__main__:INFO: Starting epoch 12
+2021-10-15 02:06:49,111:__main__:INFO: Epoch: 12, Batch: 14/14, LR: 0.0010, ActionPPL: 2.37, WordPPL: 102.61, PPL: 5.927619, LL: 688824.2651367188, |Param|: 1258.68, E[batch size]: 385.2142857142857, Throughput: 538.59 examples/sec
+2021-10-15 02:06:49,112:__main__:INFO: --------------------------------
+2021-10-15 02:06:49,112:__main__:INFO: Checking validation perplexity...
+2021-10-15 02:06:58,513:__main__:INFO: PPL: 4.983958, Loss: 93787.438686, ActionPPL: 2.286776, WordPPL: 56.287838
+2021-10-15 02:06:58,513:__main__:INFO: --------------------------------
+2021-10-15 02:06:58,514:__main__:INFO: Saving checkpoint to rnng.pt
+2021-10-15 02:06:58,567:__main__:INFO: Starting epoch 13
+2021-10-15 02:07:08,622:__main__:INFO: Epoch: 13, Batch: 14/14, LR: 0.0010, ActionPPL: 2.34, WordPPL: 95.34, PPL: 5.765269, LL: 678075.2641601562, |Param|: 1258.54, E[batch size]: 385.2142857142857, Throughput: 536.34 examples/sec
+2021-10-15 02:07:08,622:__main__:INFO: --------------------------------
+2021-10-15 02:07:08,623:__main__:INFO: Checking validation perplexity...
+2021-10-15 02:07:17,959:__main__:INFO: PPL: 4.869592, Loss: 92431.968056, ActionPPL: 2.258409, WordPPL: 53.190007
+2021-10-15 02:07:17,960:__main__:INFO: --------------------------------
+2021-10-15 02:07:17,960:__main__:INFO: Saving checkpoint to rnng.pt
+2021-10-15 02:07:18,017:__main__:INFO: Starting epoch 14
+2021-10-15 02:07:28,027:__main__:INFO: Epoch: 14, Batch: 14/14, LR: 0.0010, ActionPPL: 2.28, WordPPL: 89.54, PPL: 5.566375, LL: 664486.3579101562, |Param|: 1258.43, E[batch size]: 385.2142857142857, Throughput: 538.75 examples/sec
+2021-10-15 02:07:28,027:__main__:INFO: --------------------------------
+2021-10-15 02:07:28,028:__main__:INFO: Checking validation perplexity...
+2021-10-15 02:07:37,447:__main__:INFO: PPL: 4.710822, Loss: 90496.471424, ActionPPL: 2.197379, WordPPL: 50.542930
+2021-10-15 02:07:37,447:__main__:INFO: --------------------------------
+2021-10-15 02:07:37,448:__main__:INFO: Saving checkpoint to rnng.pt
+2021-10-15 02:07:37,504:__main__:INFO: Starting epoch 15
+2021-10-15 02:07:47,559:__main__:INFO: Epoch: 15, Batch: 14/14, LR: 0.0010, ActionPPL: 2.25, WordPPL: 84.16, PPL: 5.423212, LL: 654401.1611328125, |Param|: 1258.33, E[batch size]: 385.2142857142857, Throughput: 536.34 examples/sec
+2021-10-15 02:07:47,559:__main__:INFO: --------------------------------
+2021-10-15 02:07:47,560:__main__:INFO: Checking validation perplexity...
+2021-10-15 02:07:56,912:__main__:INFO: PPL: 4.612879, Loss: 89269.679707, ActionPPL: 2.170623, WordPPL: 48.161354
+2021-10-15 02:07:56,912:__main__:INFO: --------------------------------
+2021-10-15 02:07:56,912:__main__:INFO: Saving checkpoint to rnng.pt
+2021-10-15 02:07:56,969:__main__:INFO: Starting epoch 16
+2021-10-15 02:08:07,035:__main__:INFO: Epoch: 16, Batch: 14/14, LR: 0.0010, ActionPPL: 2.21, WordPPL: 78.19, PPL: 5.250160, LL: 641848.8410644531, |Param|: 1258.29, E[batch size]: 385.2142857142857, Throughput: 535.80 examples/sec
+2021-10-15 02:08:07,035:__main__:INFO: --------------------------------
+2021-10-15 02:08:07,036:__main__:INFO: Checking validation perplexity...
+2021-10-15 02:08:16,390:__main__:INFO: PPL: 4.533742, Loss: 88259.264187, ActionPPL: 2.139193, WordPPL: 46.936310
+2021-10-15 02:08:16,390:__main__:INFO: --------------------------------
+2021-10-15 02:08:16,391:__main__:INFO: Saving checkpoint to rnng.pt
+2021-10-15 02:08:16,449:__main__:INFO: Starting epoch 17
+2021-10-15 02:08:26,493:__main__:INFO: Epoch: 17, Batch: 14/14, LR: 0.0010, ActionPPL: 2.17, WordPPL: 74.71, PPL: 5.134638, LL: 633237.0358886719, |Param|: 1258.27, E[batch size]: 385.2142857142857, Throughput: 536.93 examples/sec
+2021-10-15 02:08:26,493:__main__:INFO: --------------------------------
+2021-10-15 02:08:26,494:__main__:INFO: Checking validation perplexity...
+2021-10-15 02:08:35,802:__main__:INFO: PPL: 4.436163, Loss: 86988.830879, ActionPPL: 2.113014, WordPPL: 44.596050
+2021-10-15 02:08:35,802:__main__:INFO: --------------------------------
+2021-10-15 02:08:35,803:__main__:INFO: Saving checkpoint to rnng.pt
+2021-10-15 02:08:35,859:__main__:INFO: Starting epoch 18
+2021-10-15 02:08:45,984:__main__:INFO: Epoch: 18, Batch: 14/14, LR: 0.0010, ActionPPL: 2.14, WordPPL: 69.96, PPL: 5.001494, LL: 623067.9165039062, |Param|: 1258.29, E[batch size]: 385.2142857142857, Throughput: 532.63 examples/sec
+2021-10-15 02:08:45,984:__main__:INFO: --------------------------------
+2021-10-15 02:08:45,985:__main__:INFO: Checking validation perplexity...
+2021-10-15 02:08:55,462:__main__:INFO: PPL: 4.377192, Loss: 86207.433361, ActionPPL: 2.098506, WordPPL: 43.123135
+2021-10-15 02:08:55,462:__main__:INFO: --------------------------------
+2021-10-15 02:08:55,462:__main__:INFO: Saving checkpoint to rnng.pt
+2021-10-15 02:08:55,518:__main__:INFO: Finished training!
