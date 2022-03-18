@@ -17,6 +17,8 @@ parser.add_argument('--ptb_file', default='D:/data/naturalstories/ptb/raw.txt')
 parser.add_argument('--token_file',
                     default='D:/data/naturalstories/all_stories.tok')
 parser.add_argument('--save_file', default='')
+parser.add_argument('--id_file', default=None, help="*-ids.csv")
+parser.add_argument('--start_fresh', action='store_true')
 
 
 def is_nonterminal(text: str):
@@ -31,8 +33,14 @@ def prune_tree(tree: str, tokens_iter, token):
         tree   - Penn Treebank-style tree.
 
         tokens - List of tokens that should appear in the resulting tree.
+               | * Excluding the first token.
 
-    Returns a Penn Treebank-style tree with the same nonterminals as a string.
+        token  - The first token that should appear in the resulting tree.
+
+    Returns a Penn Treebank-style tree with the same nonterminals as a string,
+    the next token to appear in the iterator, the entire sentence with each
+    token separated by a space, and the item of text that the final token
+    appears in (as a string id).
 
     (S (NP *) (V Believe)) ==> (S (V Believe))
 
@@ -52,6 +60,7 @@ def prune_tree(tree: str, tokens_iter, token):
     """
     instructions = tree.replace(')', ' ) ').split()
 
+    sentence = []
     stack = deque()
 
     for inst in instructions:
@@ -70,16 +79,18 @@ def prune_tree(tree: str, tokens_iter, token):
                 token = token[len(inst):]
                 if not token:
                     try:
-                        token = next(tokens_iter)
+                        token, text_item = next(tokens_iter)
                     except StopIteration:
                         token = ""
+                sentence.append(inst)
                 stack.append(inst)
             else:
                 while token and token == inst[:len(token)]:
                     inst = inst[len(token):]
+                    sentence.append(token)
                     stack.append(token)
                     try:
-                        token = next(tokens_iter)
+                        token, text_item = next(tokens_iter)
                     except StopIteration:
                         token = ""
                         break
@@ -87,7 +98,7 @@ def prune_tree(tree: str, tokens_iter, token):
     if not stack:
         return "", token
 
-    return stack.pop(), token
+    return stack.pop(), token, ' '.join(sentence), text_item
 
 
 def forest(trees):
@@ -104,7 +115,6 @@ def forest(trees):
         # [:-2] to remove ")" at end
         toret += tree[:-2]
         if toret.count('(') == toret.count(')'):
-            print(toret)
             yield toret
             toret = ""
 
@@ -126,7 +136,7 @@ def get_tokens(file_name):
     with open(file_name, 'r', encoding='utf-8') as file:
         lines = file.readlines()[1:]
     for line in lines:
-        yield remove_paren(line.split()[0])
+        yield remove_paren(line.split()[0]), line.split()[2]
 
 
 def fix_quotes(tree: str):
@@ -134,6 +144,16 @@ def fix_quotes(tree: str):
     return tree.replace("''", "'") \
                .replace("``", "'") \
                .replace('"', "'")
+
+
+def save(trees, ids, tree_file, id_file):
+    print(len(trees))
+    with open(tree_file, 'w', encoding='utf-8') as file:
+        file.write('\n'.join(trees))
+    
+    if id_file:
+        with open(id_file, 'w', encoding='utf-8') as file:
+            file.write('\n'.join(','.join(row) for row in ids))
 
 
 def main(args):
@@ -153,7 +173,7 @@ def main(args):
         save_to = os.path.join(os.path.dirname(args.ptb_file), file_name)
 
     done = []
-    if os.path.exists(save_to):
+    if os.path.exists(save_to) and not args.start_fresh:
         with open(save_to, 'r', encoding='utf-8') as file:
             done = file.read().split('\n')
         if len(done) < len(trees):
@@ -162,23 +182,27 @@ def main(args):
             done = []
 
     tokens = get_tokens(args.token_file)
-    token = next(tokens)
+    token, text_item = next(tokens)
+
+    sentences = []
+    sentence_id = 0
 
     for tree in forest(trees):
         tree = fix_quotes(tree)
-        processed, token = prune_tree(tree, tokens, token)
+        processed, token, sentence, text_item = prune_tree(tree, tokens, token)
+
+        sentence_id += 1
+        
+        sentences.append((text_item, str(sentence_id), sentence))
+
         processed = f"(* {processed})"
         assert(processed.count('(') == processed.count(')'))
-        # print(processed)
         done.append(processed)
-        if not len(done) % 16:
-            with open(save_to, 'w', encoding='utf-8') as file:
-                file.write('\n'.join(done))
-            print(len(done))
 
-    with open(save_to, 'w', encoding='utf-8') as file:
-        file.write('\n'.join(done))
-    print(len(done))
+        if not len(done) % 16:
+            save(done, sentences, save_to, args.id_file)
+
+    save(done, sentences, save_to, args.id_file)
 
 
 if __name__ == "__main__":
