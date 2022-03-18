@@ -64,7 +64,7 @@ def prune_tree(tree: str, tokens_iter, token):
             if comp:
                 stack.append(prev + comp + ')')
         elif is_nonterminal(inst):
-            stack.append(inst)
+            stack.append(inst.split('-')[0])
         else:
             if token[:len(inst)] == inst:
                 token = token[len(inst):]
@@ -88,6 +88,25 @@ def prune_tree(tree: str, tokens_iter, token):
         return "", token
 
     return stack.pop(), token
+
+
+def forest(trees):
+    """Iterate through all trees in the given list.
+    
+    This is needed because the raw ptb file actually splits by *sub*trees as
+    well as complete trees.
+
+    So this generator only yields a tree when it has a matching number of '('
+    and ')' tokens.
+    """
+    toret = ""
+    for tree in trees:
+        # [:-2] to remove ")" at end
+        toret += tree[:-2]
+        if toret.count('(') == toret.count(')'):
+            print(toret)
+            yield toret
+            toret = ""
 
 
 def remove_top(tree: str):
@@ -145,10 +164,12 @@ def main(args):
     tokens = get_tokens(args.token_file)
     token = next(tokens)
 
-    for tree in trees:
-        # [:-2] to remove ")" at end
-        tree = fix_quotes(tree[:-2])
+    for tree in forest(trees):
+        tree = fix_quotes(tree)
         processed, token = prune_tree(tree, tokens, token)
+        processed = f"(* {processed})"
+        assert(processed.count('(') == processed.count(')'))
+        # print(processed)
         done.append(processed)
         if not len(done) % 16:
             with open(save_to, 'w', encoding='utf-8') as file:

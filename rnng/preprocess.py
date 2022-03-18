@@ -342,12 +342,15 @@ def get_data(args):
     convert(args.testfile, args.lowercase, args.replace_num,
             0, args.minseqlength, args.outputfile + "-test.json",
             vocab, sp, action_dict, io_action_dict, 0, args.jobs)
-    convert(args.valfile, args.lowercase, args.replace_num,
-            args.seqlength, args.minseqlength, args.outputfile + "-val.json",
-            vocab, sp, action_dict, io_action_dict, 0, args.jobs)
-    convert(args.trainfile, args.lowercase, args.replace_num,
-            args.seqlength,  args.minseqlength, args.outputfile + "-train.json",
-            vocab, sp, action_dict, io_action_dict, 1, args.jobs)
+
+    if not args.test_file_only:
+        convert(args.valfile, args.lowercase, args.replace_num,
+                args.seqlength, args.minseqlength, args.outputfile + "-val.json",
+                vocab, sp, action_dict, io_action_dict, 0, args.jobs)
+
+        convert(args.trainfile, args.lowercase, args.replace_num,
+                args.seqlength,  args.minseqlength, args.outputfile + "-train.json",
+                vocab, sp, action_dict, io_action_dict, 1, args.jobs)
 
 def main(arguments):
     parser = argparse.ArgumentParser(
@@ -374,9 +377,10 @@ def main(arguments):
     parser.add_argument('--subword_user_defined_symbols', nargs='*',
                         help='--user_defined_symbols for sentencepiece. These tokens are not segmented into subwords.')
     parser.add_argument('--lowercase', help="Lower case", action='store_true')
+    parser.add_argument('--test_file_only', help="Avoid creating train and val json files.", action='store_true')
     parser.add_argument('--replace_num', help="Replace numbers with N", action='store_true')
-    parser.add_argument('--trainfile', help="Path to training data.", required=True)
-    parser.add_argument('--valfile', help="Path to validation data.", required=True)
+    parser.add_argument('--trainfile', help="Path to training data.", default='data/train.txt')
+    parser.add_argument('--valfile', help="Path to validation data.", default='data/valid.txt')
     parser.add_argument('--testfile', help="Path to test validation data.", required=True)
     parser.add_argument('--seqlength', help="Maximum sequence length. Sequences longer "
                                             "than this are dropped.", type=int, default=300)
