@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
-"""Transform the json file from evaluate_trees into a csv file.
+"""Transform the json file from evaluate_trees into a tsv file.
 
 Grabs the surprisal at a certain point of each syntax tree and saves the
-result in a csv file.
+result in a tsv file.
 
 Currently, this program saves two types of surprisals for each word in each
 sentence. The first is simply the surprisal of that word given the syntactic
 context. The second is the sum of the surprisals of the word AND each of its
 parent nonterminals.
 
-The csv's columns are:
+The tsv's columns are:
     * The classifier for the sentence (caus.act/cos.tran/intr)
     * The numeric identifer for the sentence
     * The id of the word in that sentence
@@ -31,7 +31,7 @@ from collections import deque
 parser = argparse.ArgumentParser()
 
 parser.add_argument('--file', default='data/ns-results.json')
-parser.add_argument('--save_file', default='data/ns-results.csv')
+parser.add_argument('--save_file', default='data/ns-results.tsv')
 parser.add_argument('--id_file', default='D:/data/naturalstories/ids.csv')
 
 is_nt = re.compile(r'NT\(.*\)')
@@ -80,14 +80,16 @@ def main(args):
     with open(args.file, 'r', encoding='utf-8') as file:
         results = json.load(file)
 
-    lines = []
+    lines = [
+        "item\tsent\ttoken_id\tword\tind\tbrn"
+    ]
 
-    for i, (name, num, sent) in enumerate(grab_ids(args.id_file)):
+    for i, (name, num, _) in enumerate(grab_ids(args.id_file)):
         actions = results[str(i)]['actions']
         tokens = results[str(i)]['tokens']
         for id, word, ind, brn in word_surps(actions, tokens):
             lines.append(
-                f"{name},{num},{str(id)},{word},{str(ind)},{str(brn)}"
+                f"{name}\t{num}\t{str(id)}\t{word}\t{str(ind)}\t{str(brn)}"
             )
 
     with open(args.save_file, 'w', encoding='utf-8') as file:

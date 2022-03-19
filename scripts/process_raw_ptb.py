@@ -189,11 +189,13 @@ def main(args):
 
     for tree in forest(trees):
         tree = fix_quotes(tree)
-        processed, token, sentence, text_item = prune_tree(tree, tokens, token)
+        processed, token, sentence, item = prune_tree(tree, tokens, token)
 
         sentence_id += 1
         
         sentences.append((text_item, str(sentence_id), sentence))
+        if text_item != item:
+            text_item = item
 
         processed = f"(* {processed})"
         assert(processed.count('(') == processed.count(')'))
