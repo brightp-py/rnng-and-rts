@@ -6,8 +6,8 @@ includes removing subtrees that include only undesired tokens.
 """
 
 import os
-
 import argparse
+
 from collections import deque
 
 parser = argparse.ArgumentParser()
@@ -17,8 +17,92 @@ parser.add_argument('--ptb_file', default='D:/data/naturalstories/ptb/raw.txt')
 parser.add_argument('--token_file',
                     default='D:/data/naturalstories/all_stories.tok')
 parser.add_argument('--save_file', default='')
-parser.add_argument('--id_file', default=None, help="*-ids.csv")
+parser.add_argument('--id_file', default=None, help="*-ids.tsv")
 parser.add_argument('--start_fresh', action='store_true')
+
+
+class TokenHolder:
+    """Iterates through trees and tokens and keeps track of indices."""
+
+
+    def __init__(self, token_file, data=None):
+
+        self._data = data if data else []
+        self._header = "Index\tComponent\tTreeInd\tTreeWord\tTokenItem\t" \
+                       "TokenZone\n"
+        self._token_iter = self._get_tokens(token_file)
+
+        self.tree_index = 1
+        self.tree_word = 0
+        self.tok_zone = 0
+
+        self.token, self.tok_item = next(self._token_iter)
+
+
+    def _get_tokens(self, file_name: str):
+        """Yield all tokens found at the given .tok file, and their item."""
+        with open(file_name, 'r', encoding='utf-8') as file:
+            lines = file.readlines()[1:]
+        for line in lines:
+            yield remove_paren(line.split()[0]), int(line.split()[2])
+    
+
+    def save(self, save_file: str):
+        """Save each component's indices to a tsv file."""
+        with open(save_file, 'w', encoding='utf-8') as file:
+            file.write(
+                self._header +
+                '\n'.join(
+                    map(
+                        lambda x: '\t'.join(map(str, x)),
+                        self._data
+                    )
+                )
+            )
+    
+
+    def next_token(self):
+        """Save next token to the `token` attr and update token indices."""
+        token, item = next(self._token_iter)
+        if self.tok_item != item:
+            self.tok_item = item
+            self.tok_zone = 0
+        self.tok_zone += 1
+        self.token = token
+    
+
+    def save_component(self, cutoff = None):
+        """Save the word at the current indices."""
+        if cutoff is None:
+            cutoff = len(self.token)
+        
+        self._data.append(
+            [self.token[:cutoff], self.tree_index, self.tree_word,
+             self.tok_item, self.tok_zone])
+        self.token = self.token[cutoff:]
+
+        if not self.token:
+            self.next_token()
+
+
+    def forest(self, trees: list[str]):
+        """Iterate through all trees in the given list and update tree indices.
+        
+        This is needed because the raw ptb file actually splits by *sub*trees
+        as well as complete trees.
+
+        So this generator only yields a tree when it has a matching number of
+        '(' and ')' tokens.
+        """
+        toret = ""
+        for tree in trees:
+            # [:-2] to remove ")" at end
+            toret += tree[:-2]
+            if toret.count('(') == toret.count(')'):
+                yield toret
+                self.tree_index += 1
+                self.tree_word = 0
+                toret = ""
 
 
 def is_nonterminal(text: str):
@@ -26,7 +110,7 @@ def is_nonterminal(text: str):
     return text[0] == '(' and not text[-1] == ')'
 
 
-def prune_tree(tree: str, tokens_iter, token):
+def prune_tree(tree: str, holder: TokenHolder):
     """Remove any terminals not in tokens and prune leafless branches.
 
     Parameters:
@@ -60,10 +144,10 @@ def prune_tree(tree: str, tokens_iter, token):
     """
     instructions = tree.replace(')', ' ) ').split()
 
-    sentence = []
     stack = deque()
 
     for inst in instructions:
+        # print(stack)
         if inst == ')':
             comp = ""
             prev = stack.pop()
@@ -75,48 +159,22 @@ def prune_tree(tree: str, tokens_iter, token):
         elif is_nonterminal(inst):
             stack.append(inst.split('-')[0])
         else:
-            if token[:len(inst)] == inst:
-                token = token[len(inst):]
-                if not token:
-                    try:
-                        token, text_item = next(tokens_iter)
-                    except StopIteration:
-                        token = ""
-                sentence.append(inst)
+            if holder.token[:len(inst)] == inst:
+                holder.save_component(len(inst))
                 stack.append(inst)
+                inst = ""
             else:
-                while token and token == inst[:len(token)]:
-                    inst = inst[len(token):]
-                    sentence.append(token)
-                    stack.append(token)
-                    try:
-                        token, text_item = next(tokens_iter)
-                    except StopIteration:
-                        token = ""
-                        break
+                while inst and holder.token == inst[:len(holder.token)]:
+                    inst = inst[len(holder.token):]
+                    stack.append(holder.token)
+                    holder.save_component()
+            if not inst:
+                holder.tree_word += 1
 
     if not stack:
-        return "", token
+        return ""
 
-    return stack.pop(), token, ' '.join(sentence), text_item
-
-
-def forest(trees):
-    """Iterate through all trees in the given list.
-    
-    This is needed because the raw ptb file actually splits by *sub*trees as
-    well as complete trees.
-
-    So this generator only yields a tree when it has a matching number of '('
-    and ')' tokens.
-    """
-    toret = ""
-    for tree in trees:
-        # [:-2] to remove ")" at end
-        toret += tree[:-2]
-        if toret.count('(') == toret.count(')'):
-            yield toret
-            toret = ""
+    return stack.pop()
 
 
 def remove_top(tree: str):
@@ -131,14 +189,6 @@ def remove_paren(token: str):
                 .replace(')', '')
 
 
-def get_tokens(file_name):
-    """Yield all tokens found at the given .tok file."""
-    with open(file_name, 'r', encoding='utf-8') as file:
-        lines = file.readlines()[1:]
-    for line in lines:
-        yield remove_paren(line.split()[0]), line.split()[2]
-
-
 def fix_quotes(tree: str):
     """Replace all quotes in the tree with single apostrophes."""
     return tree.replace("''", "'") \
@@ -146,14 +196,10 @@ def fix_quotes(tree: str):
                .replace('"', "'")
 
 
-def save(trees, ids, tree_file, id_file):
+def save(trees, tree_file):
     print(len(trees))
     with open(tree_file, 'w', encoding='utf-8') as file:
         file.write('\n'.join(trees))
-    
-    if id_file:
-        with open(id_file, 'w', encoding='utf-8') as file:
-            file.write('\n'.join(','.join(row) for row in ids))
 
 
 def main(args):
@@ -181,30 +227,22 @@ def main(args):
         else:   # restart
             done = []
 
-    tokens = get_tokens(args.token_file)
-    token, text_item = next(tokens)
+    holder = TokenHolder(args.token_file)
 
-    sentences = []
-    sentence_id = 0
-
-    for tree in forest(trees):
+    for tree in holder.forest(trees):
         tree = fix_quotes(tree)
-        processed, token, sentence, item = prune_tree(tree, tokens, token)
-
-        sentence_id += 1
-        
-        sentences.append((text_item, str(sentence_id), sentence))
-        if text_item != item:
-            text_item = item
+        processed = prune_tree(tree, holder)
 
         processed = f"(* {processed})"
         assert(processed.count('(') == processed.count(')'))
         done.append(processed)
 
         if not len(done) % 16:
-            save(done, sentences, save_to, args.id_file)
+            save(done, save_to)
+            holder.save(args.id_file)
 
-    save(done, sentences, save_to, args.id_file)
+    save(done, save_to)
+    holder.save(args.id_file)
 
 
 if __name__ == "__main__":
