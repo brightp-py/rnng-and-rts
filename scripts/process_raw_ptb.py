@@ -3,6 +3,20 @@ process_raw_ptb.py.
 
 This module is used to standardize raw Penn Treebank-style syntax trees. This
 includes removing subtrees that include only undesired tokens.
+
+ptb_file is the raw Penn Treebank-style data, as provided by the database.
+
+token_file is the tsv-style .tok file of tokens, as provided by the database.
+
+save_file is the file that the processed trees will be saved to. If no file is
+    provided, defaults to the same as ptb_file, but with "raw" replaced with
+    "processed" (or "-processed" appended to the end).
+
+id_file is the file that the key between trees and tokens is saved to.
+
+If start_fresh is selected, the program does NOT pick up where it left off and
+    instead creates trees from the very beginning of the database. Honestly,
+    this should be true by default.
 """
 
 import os
@@ -25,8 +39,20 @@ class TokenHolder:
     """Iterates through trees and tokens and keeps track of indices."""
 
 
-    def __init__(self, token_file, data=None):
+    def __init__(self, token_file: str, data=None):
+        """Create a token holder object with tokens from the given file.
+        
+        If some data has already been loaded, it should be included as a list
+        of lists, where each internal list has the following elements:
 
+        [
+            Component text,
+            Tree index,
+            Word index in tree,
+            Item in .tok,
+            Zone in .tok
+        ]
+        """
         self._data = data if data else []
         self._header = "Index\tComponent\tTreeInd\tTreeWord\tTokenItem\t" \
                        "TokenZone\n"
@@ -53,10 +79,8 @@ class TokenHolder:
             file.write(
                 self._header +
                 '\n'.join(
-                    map(
-                        lambda x: '\t'.join(map(str, x)),
-                        self._data
-                    )
+                    (str(i) + '\t' + '\t'.join(map(str, x)))
+                        for i, x in enumerate(self._data)
                 )
             )
     

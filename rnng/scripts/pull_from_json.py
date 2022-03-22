@@ -56,24 +56,25 @@ def grab_ids(file_name):
 def word_surps(instructions, tokens):
     """Yield the surprisal of each terminal node of the given tree.
     
-    Yields tuples (ID, WORD, IND, BRN), where
+    Yields tuples (ID, WORD, DEPTH, IND, BRN), where
         ID is the index of the word in this sentence
         WORD is the word itself, as a string
+        DEPTH is the depth at which the word appears in the tree
         IND is the raw surprisal of the word
         BRN is the added surprisal of the word with all its parent NTs.
     """
-    total = 0
     stack = deque()
     i = 0
     for inst, surp in instructions:
         if inst == "REDUCE":
+            stack.pop()
             continue
-        total += surp
-        stack.append(surp)
         if inst == "SHIFT":
             word_surp = tokens[i][1]
-            yield i, tokens[i][0], word_surp, word_surp + total
+            yield i, tokens[i][0], len(stack), word_surp, sum(stack)+word_surp
             i += 1
+        else:   # NT
+            stack.append(surp)
 
 
 def main(args):
@@ -81,15 +82,17 @@ def main(args):
         results = json.load(file)
 
     lines = [
-        "item\tsent\ttoken_id\tword\tind\tbrn"
+        "item\tsent\ttoken_id\tword\tdepth\tind\tbrn"
     ]
 
     for i, (name, num, _) in enumerate(grab_ids(args.id_file)):
         actions = results[str(i)]['actions']
         tokens = results[str(i)]['tokens']
-        for id, word, ind, brn in word_surps(actions, tokens):
+        for id, word, dep, ind, brn in word_surps(actions, tokens):
             lines.append(
-                f"{name}\t{num}\t{str(id)}\t{word}\t{str(ind)}\t{str(brn)}"
+                '\t'.join(map(str,
+                    [name, num, id, word, dep, ind, brn]
+                ))
             )
 
     with open(args.save_file, 'w', encoding='utf-8') as file:
