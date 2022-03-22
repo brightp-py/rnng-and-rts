@@ -1,0 +1,44 @@
+---
+title: "RNNG RT"
+output: html_notebook
+editor_options: 
+  chunk_output_type: console
+---
+
+
+# Preliminaries
+
+## Load packages
+
+```{r setup, message = FALSE, warning = FALSE}
+here::i_am("analysis/rnng_rt.Rmd")
+library(here)
+library(tidyverse) # for data processing
+library(knitr)
+# library(lmerTest)
+```
+
+```{r}
+df_rtsurp <- read_tsv(here("data/rt-surp.tsv"))
+
+df_rtsurp <- df_rtsurp %>% 
+  rename(isurp = "indep-surp",
+         rt = "reading-time")
+
+```
+
+```{r}
+
+p_rtsurp <- ggplot(
+ df_rtsurp,
+  aes(y = rt, x = isurp)
+) +
+  geom_point(
+    stat = "identity"
+  ) +
+  geom_smooth(method = lm, level = 0.99) +
+  ggtitle("title")
+p_rtsurp
+
+```
+

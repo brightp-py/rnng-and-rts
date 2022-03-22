@@ -2,3 +2,4 @@
 *.vocab
 *.csv
 *.tsv
+.Rproj.user
