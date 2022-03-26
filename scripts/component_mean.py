@@ -1,8 +1,12 @@
 """
-component_mean.py
+component_mean.py.
+
+** Currently poorly named! Actually saves median! **
 
 This program takes the average surprisal and reading time for each component
 in an id file and saves them in a .tsv format.
+
+Brighton Pauli
 """
 
 import os
@@ -17,14 +21,14 @@ DATADIR = 'D:/data/naturalstories'
 # Data path options
 parser.add_argument('--id_file', default=f'{DATADIR}/ids.tsv')
 parser.add_argument('--surp_file',
-    default=r'C:\git\rnng-and-rts\rnng\data\ns-results.tsv')
+                    default=r'C:\git\rnng-and-rts\rnng\data\ns-results.tsv')
 parser.add_argument('--rts_folder', default=f'{DATADIR}/rts-raw/')
 parser.add_argument('--save_file', default=f'{DATADIR}/rt-surp.tsv')
 
 
 def average_rts(rts_folder: str):
     """Go through all files in rts_folder and average the RT per token.
-    
+
     Returns a pandas.Dataframe object with columns ["item", "zone", "RT"].
     """
     # cols = ["WorkerId", "WorkTimeInSeconds", "correct", "item", "zone", "RT"]
@@ -54,7 +58,7 @@ def get_full_tokens(id_file: str):
             tree, tree_start, tree_end = ti, tw, tw
             item, zone_start, zone_end = ki, kz, kz
         if (tree == ti and tree_end == tw) or \
-            (item == ki and zone_end == kz):
+           (item == ki and zone_end == kz):
             word += comp
             tree_end = tw
             zone_end = kz
@@ -76,7 +80,7 @@ def main(args):
         cond = f"sent == {t} and token_id >= {ts} and token_id <= {te}"
         surp = surps.query(cond, inplace=False).sum()
         ind, brn = surp["ind"], surp["brn"]
-        
+
         cond = f"item == {z} and zone >= {zs} and zone <= {ze}"
         rt = rts.query(cond, inplace=False).sum()["RT"]
 
@@ -84,16 +88,16 @@ def main(args):
 
         if not len(lines) % 1000:
             print(len(lines))
-    
+
     with open(args.save_file, 'w', encoding='utf-8') as file:
         file.write(
-            "item\tword\treading-time\tindep-surp\tbrn-surp\n" + 
+            "item\tword\treading-time\tindep-surp\tbrn-surp\n" +
             '\n'.join(map(
                 lambda x: '\t'.join(map(str, x)),
                 lines
             ))
         )
-    
+
     print(f"Saved to {args.save_file}.")
 
 

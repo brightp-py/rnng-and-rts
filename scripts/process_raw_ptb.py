@@ -17,6 +17,8 @@ id_file is the file that the key between trees and tokens is saved to.
 If start_fresh is selected, the program does NOT pick up where it left off and
     instead creates trees from the very beginning of the database. Honestly,
     this should be true by default.
+
+Brighton Pauli
 """
 
 import os
@@ -35,13 +37,22 @@ parser.add_argument('--id_file', default=None, help="*-ids.tsv")
 parser.add_argument('--start_fresh', action='store_true')
 
 
+def get_tokens(file_name: str):
+    """Yield all tokens found at the given .tok file, and their items."""
+    with open(file_name, 'r', encoding='utf-8') as file:
+        lines = file.readlines()[1:]
+    for line in lines:
+        yield remove_paren(line.split()[0]), int(line.split()[2])
+
+
 class TokenHolder:
     """Iterates through trees and tokens and keeps track of indices."""
-
+    
+    HEADER = "Index\tComponent\tTreeInd\tTreeWord\tTokenItem\tTokenZone\n"
 
     def __init__(self, token_file: str, data=None):
         """Create a token holder object with tokens from the given file.
-        
+
         If some data has already been loaded, it should be included as a list
         of lists, where each internal list has the following elements:
 
@@ -54,9 +65,7 @@ class TokenHolder:
         ]
         """
         self._data = data if data else []
-        self._header = "Index\tComponent\tTreeInd\tTreeWord\tTokenItem\t" \
-                       "TokenZone\n"
-        self._token_iter = self._get_tokens(token_file)
+        self._token_iter = get_tokens(token_file)
 
         self.tree_index = 1
         self.tree_word = 0
@@ -64,26 +73,16 @@ class TokenHolder:
 
         self.token, self.tok_item = next(self._token_iter)
 
-
-    def _get_tokens(self, file_name: str):
-        """Yield all tokens found at the given .tok file, and their item."""
-        with open(file_name, 'r', encoding='utf-8') as file:
-            lines = file.readlines()[1:]
-        for line in lines:
-            yield remove_paren(line.split()[0]), int(line.split()[2])
-    
-
     def save(self, save_file: str):
         """Save each component's indices to a tsv file."""
         with open(save_file, 'w', encoding='utf-8') as file:
             file.write(
-                self._header +
+                TokenHolder.HEADER +
                 '\n'.join(
                     (str(i) + '\t' + '\t'.join(map(str, x)))
-                        for i, x in enumerate(self._data)
+                    for i, x in enumerate(self._data)
                 )
             )
-    
 
     def next_token(self):
         """Save next token to the `token` attr and update token indices."""
@@ -93,13 +92,12 @@ class TokenHolder:
             self.tok_zone = 0
         self.tok_zone += 1
         self.token = token
-    
 
-    def save_component(self, cutoff = None):
+    def save_component(self, cutoff=None):
         """Save the word at the current indices."""
         if cutoff is None:
             cutoff = len(self.token)
-        
+
         self._data.append(
             [self.token[:cutoff], self.tree_index, self.tree_word,
              self.tok_item, self.tok_zone])
@@ -108,10 +106,9 @@ class TokenHolder:
         if not self.token:
             self.next_token()
 
-
     def forest(self, trees: list[str]):
         """Iterate through all trees in the given list and update tree indices.
-        
+
         This is needed because the raw ptb file actually splits by *sub*trees
         as well as complete trees.
 
@@ -221,6 +218,7 @@ def fix_quotes(tree: str):
 
 
 def save(trees, tree_file):
+    """Save trees (which must be strings) to the given tree file."""
     print(len(trees))
     with open(tree_file, 'w', encoding='utf-8') as file:
         file.write('\n'.join(trees))

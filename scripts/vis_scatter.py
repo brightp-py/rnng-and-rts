@@ -2,6 +2,8 @@
 vis_scatter.py
 
 I'm tired. Documentation later.
+
+Brighton Pauli
 """
 
 import matplotlib.pyplot as plt
