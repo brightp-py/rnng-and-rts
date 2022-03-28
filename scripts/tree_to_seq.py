@@ -21,7 +21,15 @@ And , ... <eos>
 
 Brighton Pauli
 """
+import argparse
+
 import json
+
+parser = argparse.ArgumentParser()
+
+# Data path options
+parser.add_argument('--ptb_file', default='D:/data/naturalstories/ptb/raw.txt')
+parser.add_argument('--save_file', default='')
 
 
 def read_jsonl(filename):
@@ -38,3 +46,21 @@ def read_jsonl(filename):
             data = json.loads(line)
             if data['key'] == "sentence":
                 yield data
+
+
+def main(args):
+    """Load trees from the given tree file and save sentence results.
+    
+    ptb_file is a jsonl file, with the format described at the top of the
+    module. Any rows with the "sentence" key will be extracted.
+    """
+    text = []
+    for tree in read_jsonl(args.ptb_file):
+        text.append(' '.join(tree['orig_tokens']) + " <eos>")
+    with open(args.save_file, 'w', encoding='utf-8') as file:
+        file.write('\n'.join(text))
+
+
+if __name__ == "__main__":
+    arguments = parser.parse_args()
+    main(arguments)
