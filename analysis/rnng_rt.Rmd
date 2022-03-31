@@ -15,23 +15,19 @@ here::i_am("analysis/rnng_rt.Rmd")
 library(here)
 library(tidyverse) # for data processing
 library(knitr)
-# library(lmerTest)
+library(lmerTest)
 ```
 
 ```{r}
-df_rtsurp <- read_tsv(here("data/rt-surp.tsv"))
-
-df_rtsurp <- df_rtsurp %>% 
-  rename(isurp = "indep-surp",
-         rt = "reading-time")
-
+# ask Lisa why "here" isn't working :(
+df_rtsurp <- read_csv("analysis/data/final.csv")
 ```
 
 ```{r}
 
 p_rtsurp <- ggplot(
  df_rtsurp,
-  aes(y = rt, x = isurp)
+  aes(y = log(RT), x = ind)
 ) +
   geom_point(
     stat = "identity"
@@ -42,3 +38,6 @@ p_rtsurp
 
 ```
 
+```{r}
+lmer(RT ~ ind +(1|WorkerId), data=df_rtsurp)
+```
