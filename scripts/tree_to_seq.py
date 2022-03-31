@@ -28,7 +28,7 @@ import json
 parser = argparse.ArgumentParser()
 
 # Data path options
-parser.add_argument('--ptb_file', default='D:/data/naturalstories/ptb/raw.txt')
+parser.add_argument('--ptb_file', default='C:/git/rnng-and-rts/data/ptb-train.json')
 parser.add_argument('--save_file', default='')
 
 

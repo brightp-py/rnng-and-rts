@@ -2,5 +2,7 @@
 *.vocab
 *.csv
 *.tsv
+*.pt
 .Rproj.user
+lstm/data/lm/English/**
 !analysis/data/*
