@@ -162,6 +162,13 @@ df_zonemeans <- df_rtsurp %>%
     ## `summarise()` has grouped output by 'story_zone'. You can override using the
     ## `.groups` argument.
 
+which ones are over 750ms mean?
+
+``` r
+df_highmeans <- df_zonemeans %>% 
+  filter(meanRT > 750)
+```
+
 # plot
 
 summarize by story/zone means
@@ -175,13 +182,32 @@ p_rtsurp <- ggplot(
     stat = "identity"
   ) +
   geom_smooth(method = lm, level = 0.99) +
-  ggtitle("title")
+  ggtitle("RT * surprisal")
 p_rtsurp
 ```
 
     ## `geom_smooth()` using formula 'y ~ x'
 
-![](LL_analysis_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+![](LL_analysis_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+
+plot without means over 750 (mostly last word in story)
+
+``` r
+p_lower <- ggplot(
+ filter(df_zonemeans, meanRT < 750),
+  aes(y = meanRT, x = ind_surp)
+) +
+  geom_point(
+    stat = "identity"
+  ) +
+  geom_smooth(method = lm, level = 0.99) +
+  ggtitle("RT * surprisal (means under 750)")
+p_lower
+```
+
+    ## `geom_smooth()` using formula 'y ~ x'
+
+![](LL_analysis_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
 # stats
 
