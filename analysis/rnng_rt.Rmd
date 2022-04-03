@@ -11,7 +11,7 @@ editor_options:
 ## Load packages
 
 ```{r setup, message = FALSE, warning = FALSE}
-here::i_am("analysis/rnng_rt.Rmd")
+here::i_am("rnng_rt.Rmd")
 library(here)
 library(tidyverse) # for data processing
 library(knitr)
@@ -19,8 +19,7 @@ library(lmerTest)
 ```
 
 ```{r}
-# ask Lisa why "here" isn't working :(
-df_rtsurp <- read_csv("analysis/data/final.csv")
+df_rtsurp <- read_csv(here("data/final.csv"))
 ```
 
 ```{r}
@@ -39,5 +38,6 @@ p_rtsurp
 ```
 
 ```{r}
-lmer(RT ~ ind +(1|WorkerId), data=df_rtsurp)
+output <- lmer(RT ~ ind +(1|WorkerId), data=df_rtsurp)
+summary(output)
 ```
