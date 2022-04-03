@@ -4,5 +4,6 @@
 *.tsv
 *.pt
 .Rproj.user
+*.pyc
 lstm/data/lm/English/**
 !analysis/data/*

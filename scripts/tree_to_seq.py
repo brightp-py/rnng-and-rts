@@ -19,17 +19,28 @@ If you ... <eos>
 ...
 And , ... <eos>
 
+Resulting MAZE output:
+file.0;0;The boy ...
+file.1;1;I can ...
+file.2;2;If you ...
+...
+file.3;3;And , ...
+
 Brighton Pauli
 """
+import os
 import argparse
 
 import json
+from tqdm import tqdm
 
 parser = argparse.ArgumentParser()
 
 # Data path options
-parser.add_argument('--ptb_file', default='C:/git/rnng-and-rts/data/ptb-train.json')
+parser.add_argument('--ptb_file',
+    default='C:/git/rnng-and-rts/rnng/data/ptb-train.json')
 parser.add_argument('--save_file', default='')
+parser.add_argument('--maze_file', default='')
 
 
 def read_jsonl(filename):
@@ -54,13 +65,40 @@ def main(args):
     ptb_file is a jsonl file, with the format described at the top of the
     module. Any rows with the "sentence" key will be extracted.
     """
+    name = '.'.join(os.path.basename(args.ptb_file).split('.')[:-1])
     text = []
-    for tree in read_jsonl(args.ptb_file):
-        text.append(' '.join(tree['orig_tokens']) + " <eos>")
-    with open(args.save_file, 'w', encoding='utf-8') as file:
-        file.write('\n'.join(text))
+    maze = []
+
+    for i, tree in tqdm(enumerate(read_jsonl(args.ptb_file))):
+        sentence = ' '.join(tree['orig_tokens'])
+        labels = ' '.join(str(j) for j in range(len(tree['orig_tokens'])))
+        text.append(f"{sentence} <eos>")
+        maze.append(f"{name}.{str(i)};{str(i)};{sentence};{labels}")
+
+    if args.save_file:
+        with open(args.save_file, 'w', encoding='utf-8') as file:
+            file.write('\n'.join(text))
+        print(f"Saved to {args.save_file}")
+
+    if args.maze_file:
+        with open(args.maze_file, 'w', encoding='utf-8') as file:
+            file.write('\n'.join(maze))
+        print(f"Saved to {args.maze_file}")
+
+
+def validate_args(args):
+    """Ensure that the arguments fit this program's requirements.
+    
+    Confirms that ptb_file exists and that at least one of save_file or
+    maze_file is provided.
+    """
+    if not os.path.exists(args.ptb_file):
+        raise FileNotFoundError(args.ptb_file)
+    if not args.save_file and not args.maze_file:
+        raise Exception("No save files provided")
 
 
 if __name__ == "__main__":
     arguments = parser.parse_args()
+    validate_args(arguments)
     main(arguments)
