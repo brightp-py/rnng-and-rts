@@ -22,7 +22,8 @@ import pandas as pd
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("--surp_file", default="analysis/data/ns-results.tsv")
+parser.add_argument("--rnng_file", default="analysis/data/ns-results.tsv")
+parser.add_argument("--lstm_file")
 parser.add_argument("--rt_dir", default="analysis/data/rts-raw")
 parser.add_argument("--id_file", default="analysis/data/ids.tsv")
 parser.add_argument("--save_file", default="analysis/data/final.csv")
@@ -56,25 +57,34 @@ def cut_malformed(surps: pd.DataFrame, ids: pd.DataFrame):
     data = pd.concat(valid)
 
     @cache
-    def f(item, zone):
+    def f(item, zone, colname):
         return data.loc[
             (data['TokenItem']==item) & (data['TokenZone']==zone)] \
             .drop(columns=['item', 'sent', 'token_id', 'depth', 'TokenItem',
                            'TokenZone', 'word']
-            ).sum()['ind']
+            ).sum()[colname]
 
     return f
     
 
 def main(args):
-    surps = pd.read_csv(args.surp_file, sep='\t')
     ids = pd.read_csv(args.id_file, sep='\t')
     rts = get_rts(args.rt_dir).sort_values('zone')
 
-    get_surp = cut_malformed(surps, ids)
+    rnng = pd.read_csv(args.rnng_file, sep='\t')
+    lstm = pd.read_csv(args.lstm_file, sep='\t')
+
+    get_surp = cut_malformed(rnng, ids)
     
-    rts['ind'] = rts.apply(lambda row: get_surp(row['item'], row['zone']),
-        axis=1)
+    rts['ind'] = rts.apply(lambda row: get_surp(row['item'], row['zone'],
+        'ind'), axis=1)
+    
+    print(lstm)
+    get_surp = cut_malformed(lstm, ids)
+    
+    rts['lstm'] = rts.apply(lambda row: get_surp(row['item'], row['zone'],
+        'lstm'), axis=1)
+    
     print(len(rts), "reading times found.")
 
     rts.sort_values('WorkerId').to_csv(args.save_file)
