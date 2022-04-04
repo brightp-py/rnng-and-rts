@@ -17,6 +17,7 @@ Brighton Pauli
 import os
 import argparse
 from functools import cache
+from tqdm import tqdm
 
 import pandas as pd
 
@@ -41,7 +42,10 @@ def get_rts(rts_folder):
     return data
 
 
-def cut_malformed(surps: pd.DataFrame, ids: pd.DataFrame):
+def cut_malformed(surps: pd.DataFrame, ids: pd.DataFrame, drop_cols=None):
+    if not drop_cols:
+        drop_cols = []
+
     valid = []
     failed = []
     for surp, id in zip(surps.groupby(['sent']), ids.groupby(['TreeInd'])):
@@ -60,9 +64,7 @@ def cut_malformed(surps: pd.DataFrame, ids: pd.DataFrame):
     def f(item, zone, colname):
         return data.loc[
             (data['TokenItem']==item) & (data['TokenZone']==zone)] \
-            .drop(columns=['item', 'sent', 'token_id', 'depth', 'TokenItem',
-                           'TokenZone', 'word']
-            ).sum()[colname]
+            .sum()[colname] # .drop(columns=drop_cols)
 
     return f
     
@@ -74,18 +76,21 @@ def main(args):
     rnng = pd.read_csv(args.rnng_file, sep='\t')
     lstm = pd.read_csv(args.lstm_file, sep='\t')
 
-    get_surp = cut_malformed(rnng, ids)
+    print("Gathering RNNG data.")
+    get_surp = cut_malformed(rnng, ids, drop_cols=['item', 'sent', 'token_id',
+        'depth', 'TokenItem', 'TokenZone', 'word'])
     
     rts['ind'] = rts.apply(lambda row: get_surp(row['item'], row['zone'],
         'ind'), axis=1)
     
-    print(lstm)
+    print("Gathering LSTM data.")
     get_surp = cut_malformed(lstm, ids)
     
     rts['lstm'] = rts.apply(lambda row: get_surp(row['item'], row['zone'],
-        'lstm'), axis=1)
+        'surp'), axis=1)
     
     print(len(rts), "reading times found.")
+    print(f"Saving to {args.save_file}.")
 
     rts.sort_values('WorkerId').to_csv(args.save_file)
 

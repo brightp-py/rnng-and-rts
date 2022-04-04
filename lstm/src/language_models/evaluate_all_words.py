@@ -33,32 +33,39 @@ parser.add_argument('--path', type=str,
     help='path to test file (text) gold file (indices of words to evaluate)')
 
 
-def evaluate(model, data_source, trees, tokens, d, eval_batch_size, seq_len, vocab_size):
+def evaluate(model, data_source, trees_source, tokens_source, dictionary,
+             eval_batch_size, seq_len, vocab_size):
     model.eval()
     
     hidden = model.init_hidden(eval_batch_size)
 
     with torch.no_grad():
-        for i in range(0, data_source.size(0) - 1, seq_len):
-            data, targets = get_batch(data_source, i, seq_len)
-            _, trees = get_batch(trees, i, seq_len)
-            _, tokens = get_batch(tokens, i, seq_len)
+        for ind in range(0, data_source.size(0) - 1, seq_len):
+            data, targets = get_batch(data_source, ind, seq_len)
+            _, trees = get_batch(trees_source, ind, seq_len)
+            _, tokens = get_batch(tokens_source, ind, seq_len)
             output, hidden = model(data, hidden)
             output_flat = output.view(-1, vocab_size)
             hidden = repackage_hidden(hidden)
 
-            # yield from output_candidates_probs(output_flat)
-            log_probs_np = F.log_softmax(output_flat, dim=1).cpu().numpy()
-            for scores, t, tree, tok in zip(log_probs_np, targets.cpu().numpy(),
-            trees.cpu().numpy(), tokens.cpu().numpy()):
-                yield f"{str(float(scores[t]))}\t{d.idx2word[t]}\t{str(tree)}\t{str(tok)}"
+            log_probs_np = -F.log_softmax(output_flat, dim=1).cpu().numpy()
+            targets = targets.cpu().numpy()
+            trees = trees.cpu().numpy()
+            tokens = tokens.cpu().numpy()
 
+            data_lens = [data.shape[0] for data in
+                         (log_probs_np, targets, trees, tokens)]
+            data_desc = ' | '.join(map(lambda x: str(x).rjust(2), data_lens))
+            min_seq_len = min(data_lens)
 
-# def create_target_mask(test_file):
-#     sents = open(test_file, "r").readlines()
-#     len_s = sum(len(sent.split(" ")) for sent in sents)
-#     targets = np.ones(len_s, dtype=float)
-#     return targets
+            for tok_ind in range(min_seq_len):
+                target = targets[tok_ind]
+                score = str(float(log_probs_np[tok_ind][target]))
+                word = dictionary.idx2word[target]
+                tree, tok = str(trees[tok_ind]), str(tokens[tok_ind])
+                if word != "<eos>":
+                    yield f"{tree}\t{tok}\t{word}\t{score}", \
+                        f"{tree.rjust(3)} {tok.rjust(3)} ( {data_desc} )"
 
 
 def create_id_mapping(test_file):
@@ -94,7 +101,7 @@ def main(args):
     else:
         model.cpu()
     
-    batch_size = 1000
+    batch_size = 1
     seq_len = 20
 
     dictionary = dictionary_corpus.Dictionary(args.data)
@@ -109,12 +116,18 @@ def main(args):
         batch_size, args.cuda
     )
 
+    with open(args.path + ".text", 'r', encoding='utf-8') as f_read:
+        first_word = f_read.read().split()[0]
+
     with open(args.path + ".output", 'w', encoding='utf-8') as f_output:
-        for row in tqdm(
-                evaluate(model, test_data, tree_data, token_data, dictionary,
-                    batch_size, seq_len, vocab_size)):
+        f_output.write(
+            f"sent\ttoken_id\tword\tsurp\n1\t0\t{first_word}\t0\n")
+        
+        pbar = tqdm(evaluate(model, test_data, tree_data, token_data,
+                             dictionary, batch_size, seq_len, vocab_size))
+        for row, desc in pbar:
             f_output.write(row + '\n')
-            # pass
+            pbar.set_description(desc)
 
 
 if __name__ == "__main__":
