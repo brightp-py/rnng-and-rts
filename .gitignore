@@ -1,5 +1,9 @@
 *-old*
 *.vocab
+<<<<<<< Updated upstream
+=======
+*.tsv
+>>>>>>> Stashed changes
 *.pt
 .Rproj.user
 *.pyc

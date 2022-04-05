@@ -19,7 +19,7 @@ library(lmerTest)
 ```
 
 ```{r}
-df_rtsurp <- read_csv(here("data/final.csv"))
+df_rtsurp <- filter(read_csv(here("data/final.csv")), RT > 0)
 ```
 
 ```{r}
@@ -38,6 +38,6 @@ p_rtsurp
 ```
 
 ```{r}
-output <- lmer(RT ~ ind +(1|WorkerId), data=df_rtsurp)
+output <- lmer(log(RT) ~ ind +(1|WorkerId), data=df_rtsurp)
 summary(output)
 ```
