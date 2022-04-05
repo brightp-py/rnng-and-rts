@@ -16,6 +16,7 @@ library(here)
 library(tidyverse) # for data processing
 library(knitr)
 library(lmerTest)
+library(mgcv)
 ```
 
 ```{r}
@@ -38,6 +39,11 @@ p_rtsurp
 ```
 
 ```{r}
-output <- lmer(log(RT) ~ ind +(1|WorkerId), data=df_rtsurp)
+output <- lmer(log(RT) ~ lstm + ind + (1|WorkerId), data=df_rtsurp)
 summary(output)
+```
+
+```{r}
+gam_y <- gam(log(RT) ~ lstm + ind, method = "ML", data=df_rtsurp)
+summary(gam_y)
 ```
