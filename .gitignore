@@ -1,6 +1,7 @@
 *-old*
 *.vocab
 *.pt
+*.svg
 .Rproj.user
 *.pyc
 !analysis/data/*
