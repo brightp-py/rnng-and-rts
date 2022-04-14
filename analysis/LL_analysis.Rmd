@@ -21,8 +21,9 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r}
-df_rnng <- read_tsv(here("analysis/data/ns-results.tsv"))
-df_ids <- read_tsv(here("analysis/data/ids.tsv"))
+df_rnng <- read_tsv(here("data/ns-results.tsv"))
+df_lstm <- read_tsv(here("data/naturalstories.output"))
+df_ids <- read_tsv(here("data/ids.tsv"))
 df_rts <- read_tsv(here("data/processed_RTs.tsv"))
 ```
  
@@ -31,10 +32,13 @@ df_rts <- read_tsv(here("data/processed_RTs.tsv"))
 
 ```{r}
 df_rnng <- df_rnng %>% 
-  rename(story = item,
-         word_num = token_id,
+  rename(word_num = token_id,
          ind_surp = ind,
          brn_surp = brn)
+
+df_lstm <- df_lstm %>% 
+  rename(word_num = token_id,
+         lstm_surp = surp)
 
 df_ids <- df_ids %>% 
   rename(story = TokenItem,
@@ -47,7 +51,10 @@ df_ids <- df_ids %>%
 
 df_surp <- left_join(df_ids, df_rnng, by = c("sent", "word_num"), suffix = c("", ".duplicate")) %>%
  	 select(-ends_with(".duplicate")) %>% 
-      mutate(zone = if_else(story == 1, zone + 1, zone)) 
+      mutate(zone = if_else(story == 1, zone + 1, zone))
+
+df_surp <- left_join(df_surp, df_lstm, by = c("sent", "word_num"), suffix = c("", ".duplicate")) %>%
+ 	 select(-ends_with(".duplicate"))
 
 df_missing_rnng <- filter(df_surp, is.na(ind_surp))
 df_surp <- filter(df_surp, !is.na(ind_surp))
@@ -68,6 +75,7 @@ df_surp <- df_surp %>%
     depths = str_c(depth, collapse = "; "),
     ind_surp = sum(ind_surp),
     brn_surp = sum(brn_surp),
+    lstm_surp = sum(lstm_surp),
     total_words = n()
   )
 
@@ -131,7 +139,7 @@ summarize by story/zone means
 
 ```{r}
 df_zonemeans <- df_rtsurp %>% 
-  group_by(story_zone, ind_surp) %>% 
+  group_by(story_zone, lstm_surp) %>% 
   summarize(
     meanRT = mean(RT, na.rm = TRUE)
   )
@@ -157,7 +165,7 @@ summarize by story/zone means
 
 p_rtsurp <- ggplot(
  df_zonemeans,
-  aes(y = meanRT, x = ind_surp)
+  aes(y = meanRT, x = lstm_surp)
 ) +
   geom_point(
     stat = "identity"
@@ -173,20 +181,25 @@ plot without means over 750 (mostly last word in story)
 
 p_lower <- ggplot(
  filter(df_zonemeans, meanRT < 750),
-  aes(y = meanRT, x = ind_surp)
+  aes(y = meanRT, x = lstm_surp)
 ) +
   geom_point(
     stat = "identity"
   ) +
   geom_smooth(method = lm, level = 0.99) +
-  ggtitle("RT * surprisal (means under 750)")
+  ggtitle("RT * surprisal (means under 750)") +
+  xlab("LSTM Surprisal") + 
+  ylab("Mean Reading Time")
+
+imgfile <- here("imgs/rt_v_lstm.png")
+ggsave(file=imgfile, plot=p_lower, width=20, height=10, unit="cm")
 p_lower
 ```
 
 # stats
 
 ```{r}
-m_1 <- lmer(log(RT) ~ ind_surp + (1|WorkerId), data = df_rtsurp)
+m_1 <- lmer(log(RT) ~ lstm_surp + (1|WorkerId), data = df_rtsurp)
 summary(m_1)
 ```
 

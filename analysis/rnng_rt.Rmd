@@ -39,7 +39,7 @@ p_rtsurp
 ```
 
 ```{r}
-output <- lmer(log(RT) ~ lstm + ind + (1|WorkerId), data=df_rtsurp)
+output <- lmer(RT ~ lstm + ind + (1|WorkerId), data=df_rtsurp)
 summary(output)
 ```
 
