@@ -38,7 +38,7 @@ parser = argparse.ArgumentParser()
 
 # Data path options
 parser.add_argument('--ptb_file',
-    default='C:/git/rnng-and-rts/rnng/data/ptb-train.json')
+                    default='C:/git/rnng-and-rts/rnng/data/ptb-train.json')
 parser.add_argument('--save_file', default='')
 parser.add_argument('--maze_file', default='')
 
@@ -61,7 +61,7 @@ def read_jsonl(filename):
 
 def main(args):
     """Load trees from the given tree file and save sentence results.
-    
+
     ptb_file is a jsonl file, with the format described at the top of the
     module. Any rows with the "sentence" key will be extracted.
     """
@@ -88,7 +88,7 @@ def main(args):
 
 def validate_args(args):
     """Ensure that the arguments fit this program's requirements.
-    
+
     Confirms that ptb_file exists and that at least one of save_file or
     maze_file is provided.
     """

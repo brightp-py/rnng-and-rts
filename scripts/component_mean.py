@@ -54,20 +54,17 @@ class Token:
         self.zone_start = zone_start
         self.zone_end = zone_start
 
-
     def add_component(self, component, tree_end, zone_end):
         """Add a component to this token."""
         self.word += component
         self.tree_end = tree_end
         self.zone_end = zone_end
 
-
     def tree_cond(self):
         """Set up a condition that finds this token in tree data."""
         cond = f"sent == {self.tree} and word_num >= {self.tree_start} " \
                f"and word_num <= {self.tree_end}"
         return cond
-
 
     def rt_cond(self):
         """Set up a condition that finds this token in reading time data."""

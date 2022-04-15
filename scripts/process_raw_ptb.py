@@ -46,8 +46,8 @@ def get_tokens(file_name: str):
 
 
 class TokenHolder:
-    """Iterates through trees and tokens and keeps track of indices."""
-    
+    """Iterate through trees and tokens and keeps track of indices."""
+
     HEADER = "Index\tComponent\tTreeInd\tTreeWord\tTokenItem\tTokenZone\n"
 
     def __init__(self, token_file: str, data=None):
@@ -256,7 +256,7 @@ def main(args):
         processed = prune_tree(tree, holder)
 
         processed = f"(* {processed})"
-        assert(processed.count('(') == processed.count(')'))
+        assert processed.count('(') == processed.count(')')
         done.append(processed)
 
         if not len(done) % 16:
