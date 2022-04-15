@@ -26,12 +26,61 @@ parser.add_argument('--rts_folder', default=f'{DATADIR}/rts-raw/')
 parser.add_argument('--save_file', default=f'{DATADIR}/rt-surp.tsv')
 
 
+class Token:
+    """A token of text, as from the ids file.
+
+    Attributes:
+        * word - str of this token.
+        * tree - Sentence index.
+        * tree_start - Where this token starts in the tree.
+        * tree_end - Where this token ends in the tree.
+                     Optimally the same as tree_start.
+        * item - Story index.
+        * zone_start - Where this token starts in the story.
+        * zone_end - Where this token ends in the story.
+                     Optimally the same as zone_start.
+    """
+
+    def __init__(self, word, tree, tree_start, item, zone_start):
+        """Start a new, possibly incomplete token.
+
+        tree_end and zone_end are initialized as tree_start and zone_start.
+        """
+        self.word = word
+        self.tree = tree
+        self.tree_start = tree_start
+        self.tree_end = tree_start
+        self.item = item
+        self.zone_start = zone_start
+        self.zone_end = zone_start
+
+
+    def add_component(self, component, tree_end, zone_end):
+        """Add a component to this token."""
+        self.word += component
+        self.tree_end = tree_end
+        self.zone_end = zone_end
+
+
+    def tree_cond(self):
+        """Set up a condition that finds this token in tree data."""
+        cond = f"sent == {self.tree} and word_num >= {self.tree_start} " \
+               f"and word_num <= {self.tree_end}"
+        return cond
+
+
+    def rt_cond(self):
+        """Set up a condition that finds this token in reading time data."""
+        cond = f"item == {self.item} and zone >= {self.zone_start} " \
+               f"and zone <= {self.zone_end}"
+        return cond
+
+
 def average_rts(rts_folder: str):
     """Go through all files in rts_folder and average the RT per token.
 
     Returns a pandas.Dataframe object with columns ["item", "zone", "RT"].
     """
-    # cols = ["WorkerId", "WorkTimeInSeconds", "correct", "item", "zone", "RT"]
     data = None
     for root, _, files in os.walk(rts_folder):
         print(f"Found {int(len(files))} reading time files: {' '.join(files)}")
@@ -49,24 +98,17 @@ def get_full_tokens(id_file: str):
     """Yield tokens of conjoined components, with tree and tok indices."""
     with open(id_file, 'r', encoding='utf-8') as file:
         lines = file.readlines()[1:]
-    word = ""
-    tree, tree_start, tree_end = None, None, None
-    item, zone_start, zone_end = None, None, None
+    cur_token = None
     for line in lines:
-        _, comp, ti, tw, ki, kz = line.split()
-        if tree is None:
-            tree, tree_start, tree_end = ti, tw, tw
-            item, zone_start, zone_end = ki, kz, kz
-        if (tree == ti and tree_end == tw) or \
-           (item == ki and zone_end == kz):
-            word += comp
-            tree_end = tw
-            zone_end = kz
+        _, comp, tree, tree_loc, item, zone_loc = line.split()
+        if cur_token is None:
+            cur_token = Token(comp, tree, tree_loc, item, zone_loc)
+        if (tree == cur_token.tree and tree_loc == cur_token.tree_end) or \
+           (item == cur_token.item and zone_loc == cur_token.zone_end):
+            cur_token.add_component(comp, tree_loc, zone_loc)
         else:
-            yield word, tree, tree_start, tree_end, item, zone_start, zone_end
-            word = comp
-            tree, tree_start, tree_end = ti, tw, tw
-            item, zone_start, zone_end = ki, kz, kz
+            yield cur_token
+            cur_token = Token(comp, tree, tree_loc, item, zone_loc)
 
 
 def main(args):
@@ -75,17 +117,11 @@ def main(args):
     rts = average_rts(args.rts_folder)
     lines = []
 
-    for w, t, ts, te, z, zs, ze in get_full_tokens(args.id_file):
-
-        cond = f"sent == {t} and token_id >= {ts} and token_id <= {te}"
-        surp = surps.query(cond, inplace=False).sum()
+    for token in get_full_tokens(args.id_file):
+        surp = surps.query(token.tree_cond(), inplace=False).sum()
         ind, brn = surp["ind"], surp["brn"]
-
-        cond = f"item == {z} and zone >= {zs} and zone <= {ze}"
-        rt = rts.query(cond, inplace=False).sum()["RT"]
-
-        lines.append([len(lines), w, rt, ind, brn])
-
+        read_time = rts.query(token.rt_cond(), inplace=False).sum()["RT"]
+        lines.append([len(lines), token.word, read_time, ind, brn])
         if not len(lines) % 1000:
             print(len(lines))
 

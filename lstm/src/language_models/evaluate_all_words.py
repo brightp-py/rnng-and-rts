@@ -12,7 +12,6 @@ import argparse
 from tqdm import tqdm
 
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
 
 import dictionary_corpus
@@ -32,23 +31,25 @@ parser.add_argument('--cuda', action='store_true',
 parser.add_argument('--path', type=str,
     help='path to test file (text) gold file (indices of words to evaluate)')
 
+BATCH_SIZE = 1
+SEQ_LEN = 20
 
-def evaluate(model, data_source, trees_source, tokens_source, dictionary,
-             eval_batch_size, seq_len, vocab_size):
+
+def evaluate(model, data_source, trees_source, tokens_source, dictionary):
     model.eval()
-    
-    hidden = model.init_hidden(eval_batch_size)
+
+    hidden = model.init_hidden(BATCH_SIZE)
 
     with torch.no_grad():
-        for ind in range(0, data_source.size(0) - 1, seq_len):
-            data, targets = get_batch(data_source, ind, seq_len)
-            _, trees = get_batch(trees_source, ind, seq_len)
-            _, tokens = get_batch(tokens_source, ind, seq_len)
+        for ind in range(0, data_source.size(0) - 1, SEQ_LEN):
+            data, targets = get_batch(data_source, ind, SEQ_LEN)
+            _, trees = get_batch(trees_source, ind, SEQ_LEN)
+            _, tokens = get_batch(tokens_source, ind, SEQ_LEN)
             output, hidden = model(data, hidden)
-            output_flat = output.view(-1, vocab_size)
+            output = output.view(-1, len(dictionary))
             hidden = repackage_hidden(hidden)
 
-            log_probs_np = -F.log_softmax(output_flat, dim=1).cpu().numpy()
+            log_probs_np = -F.log_softmax(output, dim=1).cpu().numpy()
             targets = targets.cpu().numpy()
             trees = trees.cpu().numpy()
             tokens = tokens.cpu().numpy()
@@ -87,33 +88,29 @@ def main(args):
         else:
             torch.cuda.manual_seed(args.seed)
 
-    with open(args.checkpoint, 'rb') as f:
+    with open(args.checkpoint, 'rb') as file:
         print("Loading the model")
         if args.cuda:
-            model = torch.load(f)
+            model = torch.load(file)
         else:
-            model = torch.load(f, map_location=lambda storage, loc: storage)
-    
+            model = torch.load(file, map_location=lambda storage, loc: storage)
+
     model.eval()
 
     if args.cuda:
         model.cuda()
     else:
         model.cpu()
-    
-    batch_size = 1
-    seq_len = 20
 
     dictionary = dictionary_corpus.Dictionary(args.data)
-    vocab_size = len(dictionary)
 
     trees, tokens = create_id_mapping(args.path + ".text")
-    tree_data = batchify(torch.LongTensor(trees), batch_size, args.cuda)
-    token_data = batchify(torch.LongTensor(tokens), batch_size, args.cuda)
+    tree_data = batchify(torch.LongTensor(trees), BATCH_SIZE, args.cuda)
+    token_data = batchify(torch.LongTensor(tokens), BATCH_SIZE, args.cuda)
 
     test_data = batchify(
         dictionary_corpus.tokenize(dictionary, args.path + ".text"),
-        batch_size, args.cuda
+        BATCH_SIZE, args.cuda
     )
 
     with open(args.path + ".text", 'r', encoding='utf-8') as f_read:
@@ -121,10 +118,10 @@ def main(args):
 
     with open(args.path + ".output", 'w', encoding='utf-8') as f_output:
         f_output.write(
-            f"sent\ttoken_id\tword\tsurp\n1\t0\t{first_word}\t0\n")
-        
+            f"sent\tword_num\tword\tsurp\n1\t0\t{first_word}\t0\n")
+
         pbar = tqdm(evaluate(model, test_data, tree_data, token_data,
-                             dictionary, batch_size, seq_len, vocab_size))
+                             dictionary))
         for row, desc in pbar:
             f_output.write(row + '\n')
             pbar.set_description(desc)

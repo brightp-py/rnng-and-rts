@@ -20,8 +20,8 @@ import numpy as np
 
 import torch
 
-from data import Dataset
 from train import create_model
+from data import Dataset
 
 logger = logging.getLogger(__name__)
 
@@ -123,7 +123,6 @@ def eval_ppl(data, model, vocab):
 
 
 def main(args):
-
     logger.info('Args: %s', args)
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
