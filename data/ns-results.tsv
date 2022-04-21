@@ -1,4 +1,4 @@
-item	sent	token_id	word	depth	ind	brn
+item	sent	word_num	word	depth	leaf_surp	brn_surp
 1	1	0	If	3	1.4558699131011963	5.989597976207733
 1	1	1	you	5	1.4425878524780273	6.063130125403404
 1	1	2	were	5	3.2263100147247314	7.880554236471653

@@ -1,4 +1,4 @@
-sent	token_id	word	surp
+sent	word_num	word	surp
 1	0	If	0
 1	1	you	1.7275913953781128
 1	2	were	2.813873291015625
