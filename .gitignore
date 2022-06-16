@@ -6,6 +6,6 @@
 .RData
 .Rhistory
 *.pyc
-*.nb
+*.nb.html
 !analysis/data/*
 !data/*
