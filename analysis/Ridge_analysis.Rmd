@@ -166,7 +166,7 @@ Analyze the model.
 best_model <- glmnet(x, y, alpha = 0, lambda = best_lambda)
 coef(best_model)
 
-windows();plot(best_model, xvar = "lambda")
+plot(best_model, xvar = "lambda")
 
 y_predicted <- predict(best_model, s = best_lambda, newx = x)
 
