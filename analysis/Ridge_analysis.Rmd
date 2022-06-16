@@ -1,0 +1,178 @@
+---
+title: "Ridge Regression RNNG Natural Stories Analysis"
+author: "Brighton Pauli"
+date: "2022-06-15"
+output:
+    md_document:
+        variant: gfm
+---
+
+# Preliminaries
+
+## Load packages
+
+```{r setup, message = FALSE}
+
+here::i_am("analysis/Ridge_analysis.Rmd")
+library(here)
+library(tidyverse)
+library(glmnet)
+```
+
+## Load data
+
+```{r}
+
+df_rnng <- read_tsv(here("data/ns-results.tsv"))
+df_lstm <- read_tsv(here("data/naturalstories.output"))
+df_ids <- read_tsv(here("data/ids.tsv"))
+df_rts <- read_tsv(here("data/processed_RTs.tsv"))
+```
+
+## Clean up data and join RNNG with IDs
+
+```{r}
+
+df_lstm <- df_lstm %>%
+    rename(lstm_surp = surp)
+
+col_names <- c("sent", "word_num")
+suffixes <- c("", ".duplicate")
+
+df_surp <- left_join(df_ids, df_rnng, by = col_names, suffix = suffixes) %>%
+    select(-ends_with(".duplicate")) %>%
+    mutate(zone = if_else(story == 1, zone + 1, zone))
+
+df_surp <- left_join(df_surp, df_lstm, by = col_names, suffix = suffixes) %>%
+    select(-ends_with(".duplicate"))
+
+df_missing_rnng <- filter(df_surp, is.na(leaf_surp))
+df_surp <- filter(df_surp, !is.na(leaf_surp))
+```
+
+## Collapse rows from same zone, sum suprisals over zone
+
+```{r}
+
+df_surp <- df_surp %>%
+    group_by(story, zone, sent) %>%
+    summarize(
+        word_nums = str_c(word_num, collapse = "; "),
+        words = str_c(word, collapse = "_"),
+        indices = str_c(Index, collapse = "; "),
+        depths = str_c(depth, collapse = "; "),
+        leaf_surp = sum(leaf_surp),
+        brn_surp = sum(brn_surp),
+        lstm_surp = sum(lstm_surp),
+        total_words = n()
+    )
+
+df_surp_zone_count <- df_surp %>%
+    group_by(story) %>%
+    count()
+```
+
+## Pulling in RTs
+
+Count the item/zone rows to see if it matches the surprisal dataframe.
+
+```{r}
+
+df_rts <- rename(df_rts, story = item)
+
+df_rt_count <- df_rts %>%
+    group_by(story, zone) %>%
+    count()
+
+df_zone_count <- df_rt_count %>%
+    group_by(story) %>%
+    count()
+
+# this is a join just to check for items with RTs but without surprisals
+df_missing_surp <- left_join(df_rt_count, df_surp, by = c("story", "zone")) %>%
+    filter(is.na(indices))
+```
+
+Create joined reading times with surprisal dataframe and remove rows where 
+there is no surprisal.
+
+```{r}
+
+df_rtsurp <- left_join(df_rts, df_surp, by = c("story", "zone")) %>%
+    filter(!is.na(leaf_surp)) %>%
+    arrange(story, zone)
+```
+
+Count trials per story/zone.
+
+```{r}
+
+df_words <- df_rtsurp %>%
+    group_by(story, zone, word) %>%
+    count()
+```
+
+Add a column with story/zone identifier.
+
+```{r}
+
+df_rtsurp <- df_rtsurp %>%
+    mutate(story_zone = str_c(story, zone, sep = "_"))
+```
+
+Summarize by story/zone means.
+
+```{r}
+
+df_zonemeans <- df_rtsurp %>%
+    group_by(story_zone, lstm_surp) %>%
+    summarize(
+        meanRT = mean(RT, na.rm = TRUE)
+    )
+```
+
+Which ones are over 750ms mean?
+
+```{r}
+
+df_highmeans <- df_zonemeans %>%
+    filter(meanRT > 750)
+```
+
+
+# Ridge Regression
+
+Load x and y axes.
+
+```{r}
+
+y <- log(df_rtsurp$RT)
+x <- data.matrix(df_rtsurp[, c("lstm_surp", "leaf_surp")])
+```
+
+Find best value for lambda.
+
+```{r}
+
+cv_model <- cv.glmnet(x, y, alpha = 0)
+best_lambda <- cv_model$lambda.min
+best_lambda
+```
+
+Analyze the model.
+
+```{r}
+
+best_model <- glmnet(x, y, alpha = 0, lambda = best_lambda)
+coef(best_model)
+
+windows();plot(best_model, xvar = "lambda")
+
+y_predicted <- predict(best_model, s = best_lambda, newx = x)
+
+sst <- sum((y - mean(y))^2)
+sse <- sum((y_predicted - y)^2)
+
+rsq <- 1 - sse / sst
+rsq
+```

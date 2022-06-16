@@ -1,3 +1,14 @@
+## Natural Stories Corpus
+
+This research project makes use of the Natural Stories Corpus, a database of 
+reading times gathered from human participants reading stories. The corpus 
+makes use of rare grammatical constructions to ensure variety and test models' 
+syntactic capabilities.
+
+This corpus can be found at https://github.com/languageMIT/naturalstories.
+
+Richard Futrell, et al. "The Natural Stories corpus: A reading-time corpus of English texts containing rare syntactic constructions". Language Resources and Evaluation 55. 1(2021): 63–77.
+
 ## Data file columns
 
 * **item** (reading-time files) - The story that this data point was pulled from. **NOT** to be confused with...

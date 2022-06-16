@@ -31,21 +31,24 @@ df_rts <- read_tsv(here("data/processed_RTs.tsv"))
 ## Clean up data and join RNNG with IDs
 
 ```{r}
-df_rnng <- df_rnng %>% 
-  rename(word_num = token_id,
-         ind_surp = ind,
-         brn_surp = brn)
+# df_rnng <- df_rnng %>% 
+#   rename(word_num = token_id,
+#          leaf_surp = ind,
+#          brn_surp = brn)
 
-df_lstm <- df_lstm %>% 
-  rename(word_num = token_id,
-         lstm_surp = surp)
+# df_lstm <- df_lstm %>% 
+#   rename(word_num = token_id,
+#          lstm_surp = surp)
 
-df_ids <- df_ids %>% 
-  rename(story = TokenItem,
-         zone = TokenZone,
-         word_num = TreeWord,
-         sent = TreeInd,
-         word = Component) 
+df_lstm <- df_lstm %>%
+  rename(lstm_surp = surp)
+
+# df_ids <- df_ids %>% 
+# rename(story = TokenItem,
+#          zone = TokenZone,
+#          word_num = TreeWord,
+#          sent = TreeInd,
+#          word = Component) 
 
 # there are some missing from the RNNG surprisals - cutting those out
 
@@ -56,8 +59,8 @@ df_surp <- left_join(df_ids, df_rnng, by = c("sent", "word_num"), suffix = c("",
 df_surp <- left_join(df_surp, df_lstm, by = c("sent", "word_num"), suffix = c("", ".duplicate")) %>%
  	 select(-ends_with(".duplicate"))
 
-df_missing_rnng <- filter(df_surp, is.na(ind_surp))
-df_surp <- filter(df_surp, !is.na(ind_surp))
+df_missing_rnng <- filter(df_surp, is.na(leaf_surp))
+df_surp <- filter(df_surp, !is.na(leaf_surp))
 
 ```
 
@@ -73,7 +76,7 @@ df_surp <- df_surp %>%
     words = str_c(word, collapse = "_"),
     indices = str_c(Index, collapse = "; "),
     depths = str_c(depth, collapse = "; "),
-    ind_surp = sum(ind_surp),
+    leaf_surp = sum(leaf_surp),
     brn_surp = sum(brn_surp),
     lstm_surp = sum(lstm_surp),
     total_words = n()
@@ -114,7 +117,7 @@ create joined RT with surprisal dataframe and remove rows where there is no surp
 
 ```{r}
 df_rtsurp <- left_join(df_rts, df_surp, by = c("story", "zone")) %>% 
-  filter(!is.na(ind_surp)) %>% 
+  filter(!is.na(leaf_surp)) %>% 
   arrange(story, zone)
 
 ```
