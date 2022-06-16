@@ -3,6 +3,8 @@
 *.pt
 *.svg
 .Rproj.user
+.RData
+.Rhistory
 *.pyc
 !analysis/data/*
 !data/*
