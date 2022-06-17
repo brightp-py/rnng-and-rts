@@ -31,60 +31,41 @@ df_rts <- read_tsv(here("data/processed_RTs.tsv"))
 ## Clean up data and join RNNG with IDs
 
 ```{r}
-# df_rnng <- df_rnng %>% 
-#   rename(word_num = token_id,
-#          leaf_surp = ind,
-#          brn_surp = brn)
 
-# df_lstm <- df_lstm %>% 
-#   rename(word_num = token_id,
-#          lstm_surp = surp)
+col_names <- c("sent", "sent_pos")
+suffixes <- c("", ".duplicate")
 
-df_lstm <- df_lstm %>%
-  rename(lstm_surp = surp)
+df_surp <- left_join(df_ids, df_rnng, by = col_names, suffix = suffixes) %>%
+    select(-ends_with(".duplicate")) %>%
+    mutate(story_pos = if_else(story == 1, story_pos + 1, story_pos))
 
-# df_ids <- df_ids %>% 
-# rename(story = TokenItem,
-#          zone = TokenZone,
-#          word_num = TreeWord,
-#          sent = TreeInd,
-#          word = Component) 
-
-# there are some missing from the RNNG surprisals - cutting those out
-
-df_surp <- left_join(df_ids, df_rnng, by = c("sent", "word_num"), suffix = c("", ".duplicate")) %>%
- 	 select(-ends_with(".duplicate")) %>% 
-      mutate(zone = if_else(story == 1, zone + 1, zone))
-
-df_surp <- left_join(df_surp, df_lstm, by = c("sent", "word_num"), suffix = c("", ".duplicate")) %>%
- 	 select(-ends_with(".duplicate"))
+df_surp <- left_join(df_surp, df_lstm, by = col_names, suffix = suffixes) %>%
+    select(-ends_with(".duplicate"))
 
 df_missing_rnng <- filter(df_surp, is.na(leaf_surp))
 df_surp <- filter(df_surp, !is.na(leaf_surp))
-
 ```
 
 ## Collapse rows from same zone, sum surprisals over zone
 
 ```{r}
 
-df_surp <- df_surp %>% 
-  group_by(story, zone, sent) %>% 
-  summarize(
-    # add column showing words, word_nums, depths, indices that were combined
-    word_nums = str_c(word_num, collapse = "; "),
-    words = str_c(word, collapse = "_"),
-    indices = str_c(Index, collapse = "; "),
-    depths = str_c(depth, collapse = "; "),
-    leaf_surp = sum(leaf_surp),
-    brn_surp = sum(brn_surp),
-    lstm_surp = sum(lstm_surp),
-    total_words = n()
-  )
+df_surp <- df_surp %>%
+    group_by(story, story_pos, sent) %>%
+    summarize(
+        positions = str_c(sent_pos, collapse = "; "),
+        words = str_c(word, collapse = "_"),
+        indices = str_c(index, collapse = "; "),
+        depths = str_c(depth, collapse = "; "),
+        leaf_surp = sum(leaf_surp),
+        branch_surp = sum(branch_surp),
+        lstm_surp = sum(lstm_surp),
+        total_words = n()
+    )
 
-df_surp_zone_count <- df_surp %>% 
-  group_by(story) %>% 
-  count()
+df_surp_zone_count <- df_surp %>%
+    group_by(story) %>%
+    count()
 ```
 
 ## Pulling in RTs
@@ -93,68 +74,63 @@ Count the item/zone rows to see if it matches the surprisal dataframe.
 
 ```{r}
 
-df_rts <- rename(df_rts, story = item)
+df_rt_count <- df_rts %>%
+    group_by(story, story_pos) %>%
+    count()
 
-
-df_rt_count <- df_rts %>% 
-  group_by(story, zone) %>% 
-  count()
-
-df_zone_count <- df_rt_count %>% 
-  group_by(story) %>% 
-  count()
-
+df_zone_count <- df_rt_count %>%
+    group_by(story) %>%
+    count()
 
 # this is a join just to check for items with RTs but without surprisals
-
-df_missing_surp <- left_join(df_rt_count, df_surp, by = c("story", "zone")) %>% 
-  filter(is.na(indices))
-
-
+df_missing_surp <-
+    left_join(df_rt_count, df_surp, by = c("story", "story_pos")) %>%
+    filter(is.na(indices))
 ```
 
 create joined RT with surprisal dataframe and remove rows where there is no surprisal
 
 ```{r}
-df_rtsurp <- left_join(df_rts, df_surp, by = c("story", "zone")) %>% 
-  filter(!is.na(leaf_surp)) %>% 
-  arrange(story, zone)
 
+df_rtsurp <- left_join(df_rts, df_surp, by = c("story", "story_pos")) %>%
+    filter(!is.na(leaf_surp)) %>%
+    arrange(story, story_pos)
 ```
 
 count trials per story/zone
 
 ```{r}
-df_words <- df_rtsurp %>% 
-  group_by(story, zone, word) %>% 
-  count()
+
+df_words <- df_rtsurp %>%
+    group_by(story, story_pos, word) %>%
+    count()
 ```
  
 add a column with story/zone identifier
 
 ```{r}
-df_rtsurp <- df_rtsurp %>% 
-  mutate(story_zone  = str_c(story, zone, sep = "_"))
-  
+
+df_rtsurp <- df_rtsurp %>%
+    mutate(story_zone = str_c(story, story_pos, sep = "_"))
 ```
 
 summarize by story/zone means 
 
 ```{r}
-df_zonemeans <- df_rtsurp %>% 
-  group_by(story_zone, lstm_surp) %>% 
-  summarize(
-    meanRT = mean(RT, na.rm = TRUE)
-  )
 
+df_zonemeans <- df_rtsurp %>%
+    group_by(story_zone, leaf_surp) %>%
+    summarize(
+        mean_rt = mean(rt, na.rm = TRUE)
+    )
 ```
 
 which ones are over 750ms mean?
 
 ```{r}
-df_highmeans <- df_zonemeans %>% 
-  filter(meanRT > 750)
 
+df_highmeans <- df_zonemeans %>%
+    filter(mean_rt > 750)
 ```
 
  
@@ -168,7 +144,7 @@ summarize by story/zone means
 
 p_rtsurp <- ggplot(
  df_zonemeans,
-  aes(y = meanRT, x = lstm_surp)
+  aes(y = mean_rt, x = lstm_surp)
 ) +
   geom_point(
     stat = "identity"
@@ -183,26 +159,44 @@ plot without means over 750 (mostly last word in story)
 ```{r}
 
 p_lower <- ggplot(
- filter(df_zonemeans, meanRT < 750),
-  aes(y = meanRT, x = lstm_surp)
+ filter(df_zonemeans, mean_rt < 750),
+  aes(y = mean_rt, x = leaf_surp)
 ) +
   geom_point(
     stat = "identity"
   ) +
   geom_smooth(method = lm, level = 0.99) +
   ggtitle("RT * surprisal (means under 750)") +
-  xlab("LSTM Surprisal") + 
+  xlab("LSTM Surprisal") +
   ylab("Mean Reading Time")
 
 imgfile <- here("imgs/rt_v_lstm.png")
-ggsave(file=imgfile, plot=p_lower, width=20, height=10, unit="cm")
+ggsave(file = imgfile, plot = p_lower, width = 20, height = 10, unit = "cm")
 p_lower
+```
+
+```{r}
+rnng_v_lstm <- ggplot(
+  df_surp,
+  aes(y = branch_surp, x = lstm_surp, color = -depth)
+) +
+  geom_point(
+    stat = "identity"
+  ) +
+  geom_smooth(method = lm, level = 0.99) +
+  ggtitle("LSTM Surprisal * RNNG Surprisal") +
+  xlab("LSTM Surprisal") +
+  ylab("Branch Surprisal")
+imgfile <- here("imgs/branch_v_leaf.png")
+ggsave(file = imgfile, plot = rnng_v_lstm, width = 20, height = 10,
+  unit = "cm")
+rnng_v_lstm
 ```
 
 # stats
 
 ```{r}
-m_1 <- lmer(log(RT) ~ lstm_surp + (1|WorkerId), data = df_rtsurp)
+m_1 <- lmer(log(rt) ~ leaf_surp + (1 | worker_id), data = df_rtsurp)
 summary(m_1)
 ```
 
