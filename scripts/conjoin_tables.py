@@ -14,7 +14,6 @@ that role for now.
 Brighton Pauli
 """
 
-import os
 import argparse
 from functools import cache
 
@@ -22,34 +21,52 @@ import pandas as pd
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("--rnng_file", default="analysis/data/ns-results.tsv")
-parser.add_argument("--lstm_file")
-parser.add_argument("--rt_dir", default="analysis/data/rts-raw")
-parser.add_argument("--id_file", default="analysis/data/ids.tsv")
-parser.add_argument("--save_file", default="analysis/data/final.csv")
+DATADIR = '../data'
+
+parser.add_argument('--id_file', default=f'{DATADIR}/ids.tsv')
+parser.add_argument('--rnng_file', default=f'{DATADIR}/ns-results.tsv')
+parser.add_argument('--rts_file', default=f'{DATADIR}/processed_RTs.tsv')
+parser.add_argument('--lstm_file')
+parser.add_argument('--id_file', default=f'{DATADIR}/ids.tsv')
+parser.add_argument('--save_file', default=f'{DATADIR}/final.csv')
 
 
-def get_rts(rts_folder) -> pd.DataFrame:
+# DEPRECATED
+# def get_rts(rts_folder) -> pd.DataFrame:
+#     """Load reading times from any number of files.
+
+#     Returns a pandas Dataframe with the following columns:
+#         * WorkerId (str) - Unique identifier for the reader.
+#         * WorkTimeInSeconds (int) - Total time the reader took.
+#         * correct (int) - I don't actually know.
+#         * item (int) - Story index.
+#         * zone (int) - Token index.
+#         * RT (int) - Reading time in milliseconds.
+#     """
+#     data = None
+#     for root, _, files in os.walk(rts_folder):
+#         print(f"Found {int(len(files))} reading time files: {' '.join(files)}")
+#         for file in files:
+#             ndata = pd.read_csv(os.path.join(root, file), header=0)
+#             if data is None:
+#                 data = ndata
+#             else:
+#                 data = pd.concat((data, ndata))
+#     return data
+
+
+def get_rts(rts_file) -> pd.DataFrame:
     """Load reading times from any number of files.
 
     Returns a pandas Dataframe with the following columns:
-        * WorkerId (str) - Unique identifier for the reader.
-        * WorkTimeInSeconds (int) - Total time the reader took.
-        * correct (int) - I don't actually know.
-        * item (int) - Story index.
-        * zone (int) - Token index.
-        * RT (int) - Reading time in milliseconds.
+        * worker_id (str) - Unique identifier for the reader.
+        * work_time_total (int) - Total time the reader took.
+        * story (int) - Story index.
+        * story_pos (int) - Token index.
+        * rt (int) - Reading time in milliseconds.
     """
-    data = None
-    for root, _, files in os.walk(rts_folder):
-        print(f"Found {int(len(files))} reading time files: {' '.join(files)}")
-        for file in files:
-            ndata = pd.read_csv(os.path.join(root, file), header=0)
-            if data is None:
-                data = ndata
-            else:
-                data = pd.concat((data, ndata))
-    return data
+    df = pd.read_csv(rts_file, sep='\t', header=0)
+    return df
 
 
 def cut_malformed(surps: pd.DataFrame, ids: pd.DataFrame):
@@ -60,12 +77,12 @@ def cut_malformed(surps: pd.DataFrame, ids: pd.DataFrame):
     """
     valid = []
     failed = []
-    for surp, ind in zip(surps.groupby(['sent']), ids.groupby(['TreeInd'])):
+    for surp, ind in zip(surps.groupby(['sent']), ids.groupby(['sent'])):
         if len(surp[1]) == len(ind[1]):
-            row = pd.merge_ordered(surp[1], ind[1], left_on="token_id",
-                                   right_on="TreeWord")
+            row = pd.merge_ordered(surp[1], ind[1], left_on="sent_pos",
+                                   right_on="sent_pos")
             row = row.drop(
-                columns=['Index', 'Component', 'TreeInd', 'TreeWord'])
+                columns=['index', 'component', 'sent', 'sent_pos'])
             valid.append(row)
         else:
             failed.append(surp[0])
@@ -75,9 +92,9 @@ def cut_malformed(surps: pd.DataFrame, ids: pd.DataFrame):
     data = pd.concat(valid)
 
     @cache
-    def func(item, zone, colname):
+    def func(story, story_pos, colname):
         return data.loc[
-            (data['TokenItem'] == item) & (data['TokenZone'] == zone)] \
+            (data['story'] == story) & (data['story_pos'] == story_pos)] \
             .sum()[colname]
 
     return func
@@ -86,7 +103,7 @@ def cut_malformed(surps: pd.DataFrame, ids: pd.DataFrame):
 def main(args):
     """Cut out bad syntax trees and merge with reading times."""
     ids = pd.read_csv(args.id_file, sep='\t')
-    rts = get_rts(args.rt_dir).sort_values('zone')
+    rts = get_rts(args.rt_file).sort_values('story_pos')
 
     rnng = pd.read_csv(args.rnng_file, sep='\t')
     lstm = pd.read_csv(args.lstm_file, sep='\t')
@@ -96,21 +113,21 @@ def main(args):
     # drop_cols=['item', 'sent', 'token_id',
     # 'depth', 'TokenItem', 'TokenZone', 'word']
 
-    rts['ind'] = rts.apply(
-        lambda row: get_surp(row['item'], row['zone'], 'ind'),
+    rts['leaf_surp'] = rts.apply(
+        lambda row: get_surp(row['story'], row['story_pos'], 'ind'),
         axis=1)
 
     print("Gathering LSTM data.")
     get_surp = cut_malformed(lstm, ids)
 
-    rts['lstm'] = rts.apply(
-        lambda row: get_surp(row['item'], row['zone'], 'surp'),
+    rts['lstm_surp'] = rts.apply(
+        lambda row: get_surp(row['story'], row['story_pos'], 'surp'),
         axis=1)
 
     print(len(rts), "reading times found.")
     print(f"Saving to {args.save_file}.")
 
-    rts.sort_values('WorkerId').to_csv(args.save_file)
+    rts.sort_values('worker_id').to_csv(args.save_file)
 
 
 if __name__ == "__main__":

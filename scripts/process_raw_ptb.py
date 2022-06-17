@@ -48,7 +48,7 @@ def get_tokens(file_name: str):
 class TokenHolder:
     """Iterate through trees and tokens and keeps track of indices."""
 
-    HEADER = "Index\tComponent\tTreeInd\tTreeWord\tTokenItem\tTokenZone\n"
+    HEADER = "index\tword\tsent\tsent_pos\tstory\tstory_pos\n"
 
     def __init__(self, token_file: str, data=None):
         """Create a token holder object with tokens from the given file.

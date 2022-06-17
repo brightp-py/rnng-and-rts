@@ -16,14 +16,14 @@ import pandas as pd
 
 parser = argparse.ArgumentParser()
 
-DATADIR = 'D:/data/naturalstories'
+DATADIR = '../data'
 
 # Data path options
 parser.add_argument('--id_file', default=f'{DATADIR}/ids.tsv')
-parser.add_argument('--surp_file',
-                    default=r'C:\git\rnng-and-rts\rnng\data\ns-results.tsv')
-parser.add_argument('--rts_folder', default=f'{DATADIR}/rts-raw/')
-parser.add_argument('--save_file', default=f'{DATADIR}/rt-surp.tsv')
+parser.add_argument('--surp_file', default=f'{DATADIR}/ns-results.tsv')
+# parser.add_argument('--rts_folder', default=f'{DATADIR}/rts-raw/')
+parser.add_argument('--rts_file', default=f'{DATADIR}/processed_RTs.tsv')
+parser.add_argument('--save_file', default=f'{DATADIR}/rt_surp.tsv')
 
 
 class Token:
@@ -35,60 +35,75 @@ class Token:
         * tree_start - Where this token starts in the tree.
         * tree_end - Where this token ends in the tree.
                      Optimally the same as tree_start.
-        * item - Story index.
-        * zone_start - Where this token starts in the story.
-        * zone_end - Where this token ends in the story.
-                     Optimally the same as zone_start.
+        * story - Story index.
+        * story_start - Where this token starts in the story.
+        * story_end - Where this token ends in the story.
+                     Optimally the same as story_start.
     """
 
-    def __init__(self, word, tree, tree_start, item, zone_start):
+    def __init__(self, word, tree, tree_start, story, story_start):
         """Start a new, possibly incomplete token.
 
-        tree_end and zone_end are initialized as tree_start and zone_start.
+        tree_end and story_end are initialized as tree_start and story_start.
         """
         self.word = word
         self.tree = tree
         self.tree_start = tree_start
         self.tree_end = tree_start
-        self.item = item
-        self.zone_start = zone_start
-        self.zone_end = zone_start
+        self.story = story
+        self.story_start = story_start
+        self.story_end = story_start
 
-    def add_component(self, component, tree_end, zone_end):
+    def add_component(self, component, tree_end, story_end):
         """Add a component to this token."""
         self.word += component
         self.tree_end = tree_end
-        self.zone_end = zone_end
+        self.story_end = story_end
 
     def tree_cond(self):
         """Set up a condition that finds this token in tree data."""
-        cond = f"sent == {self.tree} and word_num >= {self.tree_start} " \
-               f"and word_num <= {self.tree_end}"
+        cond = f"sent == {self.tree} and sent_pos >= {self.tree_start} " \
+               f"and sent_pos <= {self.tree_end}"
         return cond
 
     def rt_cond(self):
         """Set up a condition that finds this token in reading time data."""
-        cond = f"item == {self.item} and zone >= {self.zone_start} " \
-               f"and zone <= {self.zone_end}"
+        cond = f"story == {self.story} and story_pos >= {self.story_start} " \
+               f"and story_pos <= {self.story_end}"
         return cond
 
 
-def average_rts(rts_folder: str):
-    """Go through all files in rts_folder and average the RT per token.
+# DEPRECATED
+# def average_rts(rts_folder: str):
+#     """Go through all files in rts_folder and average the RT per token.
 
-    Returns a pandas.Dataframe object with columns ["item", "zone", "RT"].
+#     Returns a pandas.Dataframe object with columns ["story", "story_pos",
+#     "RT"].
+#     """
+#     data = None
+#     for root, _, files in os.walk(rts_folder):
+#         print(f"Found {int(len(files))} reading time files: {' '.join(files)}")
+#         for file in files:
+#             ndata = pd.read_csv(os.path.join(root, file), header=0)
+#             if data is None:
+#                 data = ndata
+#             else:
+#                 data = pd.concat((data, ndata))
+#     return data.groupby(by=["story", "story_pos"]).median() \
+#                .drop(columns=["WorkTimeInSeconds", "correct"])
+
+
+def get_rts(rts_file: str):
+    """Grab a pandas.Dataframe object from the given tsv file.
+    
+    The file should be downloaded from the Natural Stories Corpus, and should
+    have at least the following column headers:
+    - story_pos
+    - story
+    - rt
     """
-    data = None
-    for root, _, files in os.walk(rts_folder):
-        print(f"Found {int(len(files))} reading time files: {' '.join(files)}")
-        for file in files:
-            ndata = pd.read_csv(os.path.join(root, file), header=0)
-            if data is None:
-                data = ndata
-            else:
-                data = pd.concat((data, ndata))
-    return data.groupby(by=["item", "zone"]).median() \
-               .drop(columns=["WorkTimeInSeconds", "correct"])
+    df = pd.read_csv(rts_file, sep='\t', header=0)
+    return df.groupby(by=["story", "story_pos"]).median()
 
 
 def get_full_tokens(id_file: str):
@@ -97,34 +112,35 @@ def get_full_tokens(id_file: str):
         lines = file.readlines()[1:]
     cur_token = None
     for line in lines:
-        _, comp, tree, tree_loc, item, zone_loc = line.split()
+        _, comp, tree, tree_loc, story, story_loc = line.split()
         if cur_token is None:
-            cur_token = Token(comp, tree, tree_loc, item, zone_loc)
+            cur_token = Token(comp, tree, tree_loc, story, story_loc)
         if (tree == cur_token.tree and tree_loc == cur_token.tree_end) or \
-           (item == cur_token.item and zone_loc == cur_token.zone_end):
-            cur_token.add_component(comp, tree_loc, zone_loc)
+           (story == cur_token.story and story_loc == cur_token.story_end):
+            cur_token.add_component(comp, tree_loc, story_loc)
         else:
             yield cur_token
-            cur_token = Token(comp, tree, tree_loc, item, zone_loc)
+            cur_token = Token(comp, tree, tree_loc, story, story_loc)
 
 
 def main(args):
     """Take the average surprisal and reading time for each component."""
     surps = pd.read_csv(args.surp_file, sep='\t', header=0)
-    rts = average_rts(args.rts_folder)
+    # rts = average_rts(args.rts_folder)
+    rts = get_rts(args.rts_file)
     lines = []
 
     for token in get_full_tokens(args.id_file):
         surp = surps.query(token.tree_cond(), inplace=False).sum()
-        ind, brn = surp["ind"], surp["brn"]
-        read_time = rts.query(token.rt_cond(), inplace=False).sum()["RT"]
+        ind, brn = surp["leaf_surp"], surp["branch_surp"]
+        read_time = rts.query(token.rt_cond(), inplace=False).sum()["rt"]
         lines.append([len(lines), token.word, read_time, ind, brn])
         if not len(lines) % 1000:
             print(len(lines))
 
     with open(args.save_file, 'w', encoding='utf-8') as file:
         file.write(
-            "item\tword\treading-time\tindep-surp\tbrn-surp\n" +
+            "story\tword\trt\tleaf_surp\tbranch_surp\n" +
             '\n'.join(map(
                 lambda x: '\t'.join(map(str, x)),
                 lines
