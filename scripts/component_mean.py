@@ -20,8 +20,8 @@ DATADIR = '../data'
 
 # Data path options
 parser.add_argument('--id_file', default=f'{DATADIR}/ids.tsv')
-parser.add_argument('--surp_file', default=f'{DATADIR}/ns-results.tsv')
-# parser.add_argument('--rts_folder', default=f'{DATADIR}/rts-raw/')
+parser.add_argument('--surp_file',
+    default=f'{DATADIR}/naturalstories_rnng.output')
 parser.add_argument('--rts_file', default=f'{DATADIR}/processed_RTs.tsv')
 parser.add_argument('--save_file', default=f'{DATADIR}/rt_surp.tsv')
 
@@ -73,26 +73,6 @@ class Token:
         return cond
 
 
-# DEPRECATED
-# def average_rts(rts_folder: str):
-#     """Go through all files in rts_folder and average the RT per token.
-
-#     Returns a pandas.Dataframe object with columns ["story", "story_pos",
-#     "RT"].
-#     """
-#     data = None
-#     for root, _, files in os.walk(rts_folder):
-#         print(f"Found {int(len(files))} reading time files: {' '.join(files)}")
-#         for file in files:
-#             ndata = pd.read_csv(os.path.join(root, file), header=0)
-#             if data is None:
-#                 data = ndata
-#             else:
-#                 data = pd.concat((data, ndata))
-#     return data.groupby(by=["story", "story_pos"]).median() \
-#                .drop(columns=["WorkTimeInSeconds", "correct"])
-
-
 def get_rts(rts_file: str):
     """Grab a pandas.Dataframe object from the given tsv file.
     
@@ -126,7 +106,6 @@ def get_full_tokens(id_file: str):
 def main(args):
     """Take the average surprisal and reading time for each component."""
     surps = pd.read_csv(args.surp_file, sep='\t', header=0)
-    # rts = average_rts(args.rts_folder)
     rts = get_rts(args.rts_file)
     lines = []
 

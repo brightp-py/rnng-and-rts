@@ -116,9 +116,9 @@ def main(args):
     with open(args.path + ".text", 'r', encoding='utf-8') as f_read:
         first_word = f_read.read().split()[0]
 
-    with open(args.path + ".output", 'w', encoding='utf-8') as f_output:
+    with open(args.path + "_lstm.output", 'w', encoding='utf-8') as f_output:
         f_output.write(
-            f"sent\tword_num\tword\tsurp\n1\t0\t{first_word}\t0\n")
+            f"sent\tsent_pos\tword\tlstm_surp\n1\t0\t{first_word}\t0\n")
 
         pbar = tqdm(evaluate(model, test_data, tree_data, token_data,
                              dictionary))

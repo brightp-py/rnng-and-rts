@@ -5,7 +5,7 @@ Bring together two tables:
  - Reading times by subject by token
  - Surprisal by token
 
-This should be the final step before R anaysis.
+This should be the final step before R analysis.
 
 Ideally, this process would be included in the R analysis to lower the number
 of steps needed to get data visualizations, but this Python script will fill
@@ -24,39 +24,16 @@ parser = argparse.ArgumentParser()
 DATADIR = '../data'
 
 parser.add_argument('--id_file', default=f'{DATADIR}/ids.tsv')
-parser.add_argument('--rnng_file', default=f'{DATADIR}/ns-results.tsv')
+parser.add_argument('--rnng_file',
+    default=f'{DATADIR}/naturalstories_rnng.output')
 parser.add_argument('--rts_file', default=f'{DATADIR}/processed_RTs.tsv')
 parser.add_argument('--lstm_file')
 parser.add_argument('--id_file', default=f'{DATADIR}/ids.tsv')
 parser.add_argument('--save_file', default=f'{DATADIR}/final.csv')
 
 
-# DEPRECATED
-# def get_rts(rts_folder) -> pd.DataFrame:
-#     """Load reading times from any number of files.
-
-#     Returns a pandas Dataframe with the following columns:
-#         * WorkerId (str) - Unique identifier for the reader.
-#         * WorkTimeInSeconds (int) - Total time the reader took.
-#         * correct (int) - I don't actually know.
-#         * item (int) - Story index.
-#         * zone (int) - Token index.
-#         * RT (int) - Reading time in milliseconds.
-#     """
-#     data = None
-#     for root, _, files in os.walk(rts_folder):
-#         print(f"Found {int(len(files))} reading time files: {' '.join(files)}")
-#         for file in files:
-#             ndata = pd.read_csv(os.path.join(root, file), header=0)
-#             if data is None:
-#                 data = ndata
-#             else:
-#                 data = pd.concat((data, ndata))
-#     return data
-
-
 def get_rts(rts_file) -> pd.DataFrame:
-    """Load reading times from any number of files.
+    """Load reading times from a file.
 
     Returns a pandas Dataframe with the following columns:
         * worker_id (str) - Unique identifier for the reader.

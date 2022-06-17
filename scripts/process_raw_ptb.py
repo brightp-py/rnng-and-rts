@@ -28,10 +28,11 @@ from collections import deque
 
 parser = argparse.ArgumentParser()
 
+DATADIR = 'D:/data/naturalstories'
+
 # Data path options
-parser.add_argument('--ptb_file', default='D:/data/naturalstories/ptb/raw.txt')
-parser.add_argument('--token_file',
-                    default='D:/data/naturalstories/all_stories.tok')
+parser.add_argument('--ptb_file', default=f'{DATADIR}/ptb/raw.txt')
+parser.add_argument('--token_file', default=f'{DATADIR}/all_stories.tok')
 parser.add_argument('--save_file', default='')
 parser.add_argument('--id_file', default=None, help="*-ids.tsv")
 parser.add_argument('--start_fresh', action='store_true')

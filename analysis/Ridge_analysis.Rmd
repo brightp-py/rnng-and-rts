@@ -33,15 +33,12 @@ df_rts <- read_tsv(here("data/processed_RTs.tsv"))
 
 ```{r}
 
-df_lstm <- df_lstm %>%
-    rename(lstm_surp = surp)
-
-col_names <- c("sent", "word_num")
+col_names <- c("sent", "sent_pos")
 suffixes <- c("", ".duplicate")
 
 df_surp <- left_join(df_ids, df_rnng, by = col_names, suffix = suffixes) %>%
     select(-ends_with(".duplicate")) %>%
-    mutate(zone = if_else(story == 1, zone + 1, zone))
+    mutate(story_pos = if_else(story == 1, story_pos + 1, story_pos))
 
 df_surp <- left_join(df_surp, df_lstm, by = col_names, suffix = suffixes) %>%
     select(-ends_with(".duplicate"))
@@ -50,19 +47,19 @@ df_missing_rnng <- filter(df_surp, is.na(leaf_surp))
 df_surp <- filter(df_surp, !is.na(leaf_surp))
 ```
 
-## Collapse rows from same zone, sum suprisals over zone
+## Collapse rows from same story_pos, sum suprisals over story_pos
 
 ```{r}
 
 df_surp <- df_surp %>%
-    group_by(story, zone, sent) %>%
+    group_by(story, story_pos, sent) %>%
     summarize(
-        word_nums = str_c(word_num, collapse = "; "),
+        positions = str_c(sent_pos, collapse = "; "),
         words = str_c(word, collapse = "_"),
-        indices = str_c(Index, collapse = "; "),
+        indices = str_c(index, collapse = "; "),
         depths = str_c(depth, collapse = "; "),
         leaf_surp = sum(leaf_surp),
-        brn_surp = sum(brn_surp),
+        branch_surp = sum(branch_surp),
         lstm_surp = sum(lstm_surp),
         total_words = n()
     )
@@ -74,14 +71,12 @@ df_surp_zone_count <- df_surp %>%
 
 ## Pulling in RTs
 
-Count the item/zone rows to see if it matches the surprisal dataframe.
+Count the item/story_pos rows to see if it matches the surprisal dataframe.
 
 ```{r}
 
-df_rts <- rename(df_rts, story = item)
-
 df_rt_count <- df_rts %>%
-    group_by(story, zone) %>%
+    group_by(story, story_pos) %>%
     count()
 
 df_zone_count <- df_rt_count %>%
@@ -89,7 +84,8 @@ df_zone_count <- df_rt_count %>%
     count()
 
 # this is a join just to check for items with RTs but without surprisals
-df_missing_surp <- left_join(df_rt_count, df_surp, by = c("story", "zone")) %>%
+df_missing_surp <-
+    left_join(df_rt_count, df_surp, by = c("story", "story_pos")) %>%
     filter(is.na(indices))
 ```
 
@@ -98,9 +94,9 @@ there is no surprisal.
 
 ```{r}
 
-df_rtsurp <- left_join(df_rts, df_surp, by = c("story", "zone")) %>%
+df_rtsurp <- left_join(df_rts, df_surp, by = c("story", "story_pos")) %>%
     filter(!is.na(leaf_surp)) %>%
-    arrange(story, zone)
+    arrange(story, story_pos)
 ```
 
 Count trials per story/zone.
@@ -108,7 +104,7 @@ Count trials per story/zone.
 ```{r}
 
 df_words <- df_rtsurp %>%
-    group_by(story, zone, word) %>%
+    group_by(story, story_pos, word) %>%
     count()
 ```
 
@@ -117,7 +113,7 @@ Add a column with story/zone identifier.
 ```{r}
 
 df_rtsurp <- df_rtsurp %>%
-    mutate(story_zone = str_c(story, zone, sep = "_"))
+    mutate(story_zone = str_c(story, story_pos, sep = "_"))
 ```
 
 Summarize by story/zone means.
@@ -127,7 +123,7 @@ Summarize by story/zone means.
 df_zonemeans <- df_rtsurp %>%
     group_by(story_zone, lstm_surp) %>%
     summarize(
-        meanRT = mean(RT, na.rm = TRUE)
+        mean_rt = mean(rt, na.rm = TRUE)
     )
 ```
 
@@ -136,7 +132,7 @@ Which ones are over 750ms mean?
 ```{r}
 
 df_highmeans <- df_zonemeans %>%
-    filter(meanRT > 750)
+    filter(mean_rt > 750)
 ```
 
 
@@ -146,7 +142,7 @@ Load x and y axes.
 
 ```{r}
 
-y <- log(df_rtsurp$RT)
+y <- log(df_rtsurp$rt)
 x <- data.matrix(df_rtsurp[, c("lstm_surp", "leaf_surp")])
 ```
 

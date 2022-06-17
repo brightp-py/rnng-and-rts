@@ -31,7 +31,7 @@ from collections import deque
 parser = argparse.ArgumentParser()
 
 parser.add_argument('--file', default='data/ns-results.json')
-parser.add_argument('--save_file', default='data/ns-results.tsv')
+parser.add_argument('--save_file', default='data/naturalstories_rnng.output')
 parser.add_argument('--id_file', default='D:/data/naturalstories/ids.csv')
 
 is_nt = re.compile(r'NT\(.*\)')
@@ -56,11 +56,11 @@ def grab_ids(file_name):
 def word_surps(instructions, tokens):
     """Yield the surprisal of each terminal node of the given tree.
     
-    Yields tuples (ID, WORD, DEPTH, IND, BRN), where
+    Yields tuples (ID, WORD, DEPTH, LEAf, BRN), where
         ID is the index of the word in this sentence
         WORD is the word itself, as a string
         DEPTH is the depth at which the word appears in the tree
-        IND is the raw surprisal of the word
+        LEAF is the raw surprisal of the word
         BRN is the added surprisal of the word with all its parent NTs.
     """
     stack = deque()
@@ -82,9 +82,10 @@ def main(args):
         results = json.load(file)
 
     lines = [
-        "item\tsent\ttoken_id\tword\tdepth\tind\tbrn"
+        "item\tsent\tsent_pos\tword\tdepth\tleaf_surp\tbranch_surp"
     ]
 
+    # TODO: #1 Use a pandas DataFrame instead of manually forming a tsv.
     for i, (name, num, _) in enumerate(grab_ids(args.id_file)):
         actions = results[str(i)]['actions']
         tokens = results[str(i)]['tokens']

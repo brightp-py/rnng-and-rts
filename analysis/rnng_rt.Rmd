@@ -20,14 +20,14 @@ library(mgcv)
 ```
 
 ```{r}
-df_rtsurp <- filter(read_csv(here("data/final.csv")), RT > 0)
+df_rtsurp <- filter(read_csv(here("data/final.csv")), rt > 0)
 ```
 
 ```{r}
 
 p_rtsurp <- ggplot(
  df_rtsurp,
-  aes(y = log(RT), x = ind)
+  aes(y = log(rt), x = leaf_surp)
 ) +
   geom_point(
     stat = "identity"
@@ -39,11 +39,11 @@ p_rtsurp
 ```
 
 ```{r}
-output <- lmer(RT ~ lstm + ind + (1|WorkerId), data=df_rtsurp)
+output <- lmer(rt ~ lstm_surp + leaf_surp + (1 | worker_id), data = df_rtsurp)
 summary(output)
 ```
 
 ```{r}
-gam_y <- gam(log(RT) ~ lstm + ind, method = "ML", data=df_rtsurp)
+gam_y <- gam(log(rt) ~ lstm_surp + leaf_surp, method = "ML", data = df_rtsurp)
 summary(gam_y)
 ```

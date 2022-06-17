@@ -11,15 +11,14 @@ Richard Futrell, et al. "The Natural Stories corpus: A reading-time corpus of En
 
 ## Data file columns
 
-* **item** (reading-time files) - The story that this data point was pulled from. **NOT** to be confused with...
-* **item** (some RNNG surprisal files) - Simply the index of the datapoint in the file. This can almost always be ignored.
-* **zone** (reading-time files) - The index of the word in whichever *item* (story) it appears in.
-* **sent** (surprisal files) - The sentence this token appears in.
-* **word_num** (surprisal files) - The index of this word in its sentence.
+* **story** - The story that this data point was pulled from.
+* **story** - The index of the word in whichever *story* it appears in.
+* **sent** - The sentence this token appears in.
+* **sent_pos** - The index of this word in its sentence.
 * **word** - Word as it appears in the text.
-* **leaf_surp** (RNNG surprisal files) - RNNG surprisal of a word *ignoring* any syntactic instructions that precede it.
-* **brn_surp** (RNNG surprisal files) - RNNG surprisal of a word *including* any parent syntactic nodes.
-* **surp** (LSTM surprisal files) - LSTM surprisal of a word.
+* **leaf_surp** - RNNG surprisal of a word *ignoring* any syntactic instructions that precede it.
+* **branch_surp** - RNNG surprisal of a word *including* any parent syntactic nodes.
+* **lstm_surp** - LSTM surprisal of a word.
 
 ## Files added or edited by me
 
