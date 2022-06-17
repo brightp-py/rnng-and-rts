@@ -23,8 +23,8 @@ library(glmnet)
 
 ```{r}
 
-df_rnng <- read_tsv(here("data/ns-results.tsv"))
-df_lstm <- read_tsv(here("data/naturalstories.output"))
+df_rnng <- read_tsv(here("data/naturalstories_rnng.output"))
+df_lstm <- read_tsv(here("data/naturalstories_lstm.output"))
 df_ids <- read_tsv(here("data/ids.tsv"))
 df_rts <- read_tsv(here("data/processed_RTs.tsv"))
 ```
