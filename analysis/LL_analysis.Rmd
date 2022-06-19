@@ -54,7 +54,7 @@ df_surp <- df_surp %>%
     group_by(story, story_pos, sent) %>%
     summarize(
         positions = str_c(sent_pos, collapse = "; "),
-        words = str_c(word, collapse = "_"),
+        word = str_c(word, collapse = "_"),
         indices = str_c(index, collapse = "; "),
         depths = str_c(depth, collapse = "; "),
         leaf_surp = sum(leaf_surp),
@@ -105,6 +105,18 @@ df_words <- df_rtsurp %>%
     group_by(story, story_pos, word) %>%
     count()
 ```
+
+add word length and frequency columns
+
+```{r}
+
+df_rtsurp$word_length <- nchar(df_rtsurp$word.x)
+
+df_wordfreq <- read_tsv(here("data/wordfreq.tsv"))
+df_rtsurp <- df_rtsurp %>%
+  left_join(df_wordfreq, by = c("word.x" = "word"))
+df_rtsurp[is.na(df_rtsurp)] <- df_wordfreq$freq[df_wordfreq$word == "<unk>"]
+```
  
 add a column with story/zone identifier
 
@@ -119,7 +131,7 @@ summarize by story/zone means
 ```{r}
 
 df_zonemeans <- df_rtsurp %>%
-    group_by(story_zone, leaf_surp) %>%
+    group_by(story_zone, leaf_surp, freq) %>%
     summarize(
         mean_rt = mean(rt, na.rm = TRUE)
     )
@@ -132,8 +144,6 @@ which ones are over 750ms mean?
 df_highmeans <- df_zonemeans %>%
     filter(mean_rt > 750)
 ```
-
- 
  
  
 # plot
@@ -160,7 +170,7 @@ plot without means over 750 (mostly last word in story)
 
 p_lower <- ggplot(
  filter(df_zonemeans, mean_rt < 750),
-  aes(y = mean_rt, x = leaf_surp)
+  aes(y = mean_rt, x = freq)
 ) +
   geom_point(
     stat = "identity"
@@ -193,10 +203,20 @@ ggsave(file = imgfile, plot = rnng_v_lstm, width = 20, height = 10,
 rnng_v_lstm
 ```
 
+get the words with the greatest difference between LSTM and RNNG results
+
+```{r}
+
+df_surp[order(df_surp$leaf_surp / df_surp$lstm_surp),
+  c("word", "story", "story_pos", "lstm_surp", "leaf_surp")] %>%
+  filter(lstm_surp > 12 && lstm_surp < 16 && leaf_surp < 7) %>%
+  write.csv(file = here("./data/leafy_words.tsv"), quote = FALSE, sep = '\t')
+```
+
 # stats
 
 ```{r}
-m_1 <- lmer(log(rt) ~ leaf_surp + (1 | worker_id), data = df_rtsurp)
+m_1 <- lmer(log(rt) ~ freq + word_length + branch_surp + (1 | worker_id), data = df_rtsurp)
 summary(m_1)
 ```
 
