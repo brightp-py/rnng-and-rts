@@ -1,0 +1,163 @@
+C:\Users\Brighton\anaconda3\envs\myenv\lib\site-packages\torch\nn\functional.py:1805: UserWarning: nn.functional.sigmoid is deprecated. Use torch.sigmoid instead.
+  warnings.warn("nn.functional.sigmoid is deprecated. Use torch.sigmoid instead.")
+C:\Users\Brighton\anaconda3\envs\myenv\lib\site-packages\torch\nn\functional.py:1794: UserWarning: nn.functional.tanh is deprecated. Use torch.tanh instead.
+  warnings.warn("nn.functional.tanh is deprecated. Use torch.tanh instead.")
+ElboPPL: 108.24, ReconPPL: 69.63, KL: 6.2795, IwaePPL: 107.81, CorpusF1: 38.09, SentAvgF1: 31.81
+Starting epoch 1
+Epoch: 1, Batch: 500/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.1584, TrainVAEPPL: 120.89, TrainReconPPL: 75.27, TrainKL: 6.34, TrainIWAEPPL: 75.53, |Param|: 696.82, BestValPerf: 107.81, BestValF1: 38.09, KLPen: 0.0145, GoldTreeF1: 46.43, Throughput: 5.81 examples/sec
+PRED: ((Uh ,) (and (he was)))
+GOLD: (Uh (, (and (he was))))
+Epoch: 1, Batch: 1000/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.1460, TrainVAEPPL: 120.89, TrainReconPPL: 75.31, TrainKL: 6.42, TrainIWAEPPL: 75.83, |Param|: 700.10, BestValPerf: 107.81, BestValF1: 38.09, KLPen: 0.0289, GoldTreeF1: 46.28, Throughput: 5.88 examples/sec
+PRED: (but ((I ((was still) (in (high school)))) ,))
+GOLD: (but (I ((was (still (in (high school)))) ,)))
+Epoch: 1, Batch: 1500/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.1462, TrainVAEPPL: 121.98, TrainReconPPL: 75.92, TrainKL: 6.51, TrainIWAEPPL: 76.72, |Param|: 703.48, BestValPerf: 107.81, BestValF1: 38.09, KLPen: 0.0434, GoldTreeF1: 45.88, Throughput: 5.75 examples/sec
+PRED: (and (then (you (can (make chocolate)))))
+GOLD: ((and then) (you (can (make chocolate))))
+Epoch: 1, Batch: 2000/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.1401, TrainVAEPPL: 120.51, TrainReconPPL: 74.93, TrainKL: 6.53, TrainIWAEPPL: 75.98, |Param|: 706.90, BestValPerf: 107.81, BestValF1: 38.09, KLPen: 0.0579, GoldTreeF1: 46.07, Throughput: 5.81 examples/sec
+PRED: ((there (were (three (of (us (who went)))))) .)
+GOLD: (there ((were (three ((of us) (who went)))) .))
+Epoch: 1, Batch: 2500/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.1351, TrainVAEPPL: 119.68, TrainReconPPL: 74.36, TrainKL: 6.55, TrainIWAEPPL: 75.67, |Param|: 710.34, BestValPerf: 107.81, BestValF1: 38.09, KLPen: 0.0724, GoldTreeF1: 46.03, Throughput: 5.80 examples/sec
+PRED: ((Acting (((only (as (interpreter Carla))) (, ((her (hands folded)) (on (her lap))))) (, (was (utterly impersonal))))) .)
+GOLD: ((Acting (only (as interpreter))) ((Carla (, ((her hands) (folded (on (her lap)))))) (, ((was (utterly impersonal)) .))))
+Epoch: 1, Batch: 3000/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.1339, TrainVAEPPL: 119.64, TrainReconPPL: 74.26, TrainKL: 6.55, TrainIWAEPPL: 75.82, |Param|: 713.58, BestValPerf: 107.81, BestValF1: 38.09, KLPen: 0.0869, GoldTreeF1: 45.90, Throughput: 5.83 examples/sec
+PRED: ((At ((one point) (, ((the (Dow (Jones (Industrial (average (fell (about (80 points)))))))) (on (news (that (UAL (Corp. (decided (to (remain independent)))))))))))) .)
+GOLD: ((At (one point)) (, ((the (Dow (Jones (Industrial average)))) ((fell (((about 80) points) (on (news (that ((UAL Corp.) (decided (to (remain independent))))))))) .))))
+Epoch: 1, Batch: 3500/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.1367, TrainVAEPPL: 119.94, TrainReconPPL: 74.39, TrainKL: 6.64, TrainIWAEPPL: 76.24, |Param|: 717.20, BestValPerf: 107.81, BestValF1: 38.09, KLPen: 0.1015, GoldTreeF1: 45.81, Throughput: 5.75 examples/sec
+PRED: ((When ((((a (David (Baltimore (-- (or (the (next (target (-- (decides (it (is (better (to (stand (up (to (these forces)))))))))))))))))) (, (his (fellow (scientists (would (do (well (to (recognize (what (is (fundamentally (at stake)))))))))))))) ,) (and (offer (their (public support)))))) .)
+GOLD: ((When (((a (David Baltimore)) (-- (or ((the (next target)) --)))) (decides (it (is (better (to (stand (up (to (these forces))))))))))) (, ((his (fellow scientists)) ((would (do (well (to ((recognize (what (is (fundamentally (at stake))))) (, (and (offer (their (public support)))))))))) .))))
+Epoch: 1, Batch: 4000/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.1379, TrainVAEPPL: 119.74, TrainReconPPL: 74.28, TrainKL: 6.68, TrainIWAEPPL: 76.40, |Param|: 720.63, BestValPerf: 107.81, BestValF1: 38.09, KLPen: 0.1160, GoldTreeF1: 45.63, Throughput: 5.66 examples/sec
+PRED: (Pay (((him '') !) !))
+GOLD: ((Pay him) ('' (! !)))
+Epoch: 1, Batch: 4500/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.1350, TrainVAEPPL: 118.92, TrainReconPPL: 73.70, TrainKL: 6.65, TrainIWAEPPL: 76.06, |Param|: 723.84, BestValPerf: 107.81, BestValF1: 38.09, KLPen: 0.1306, GoldTreeF1: 45.67, Throughput: 5.61 examples/sec
+PRED: ((There are) (, (((((he thought) (, (so (few (true (means ((of forgetfulness) (in ((this life) (that (why (should (he (shun (the (medicine (even (when (the (medicine seemed)))))))))))))))))))) (, (as (it did)))) (, ((a (little crude)) ?))) ?)))
+GOLD: (There ((are (, ((he thought) (, ((((so few) (true means)) (of forgetfulness)) ((in (this life)) (that (why (should (he (shun ((the medicine) (even (when ((the medicine) (seemed (, ((as (it did)) (, (a (little crude))))))))))))))))))))) (? ?)))
+Epoch: 1, Batch: 5000/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.1337, TrainVAEPPL: 119.00, TrainReconPPL: 73.71, TrainKL: 6.72, TrainIWAEPPL: 76.35, |Param|: 727.30, BestValPerf: 107.81, BestValF1: 38.09, KLPen: 0.1451, GoldTreeF1: 45.52, Throughput: 5.47 examples/sec
+PRED: ((I (went (where (I (wanted (to go)))))) .)
+GOLD: (I ((went (where (I (wanted (to go))))) .))
+Epoch: 1, Batch: 5500/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.1328, TrainVAEPPL: 118.56, TrainReconPPL: 73.47, TrainKL: 6.73, TrainIWAEPPL: 76.37, |Param|: 730.64, BestValPerf: 107.81, BestValF1: 38.09, KLPen: 0.1595, GoldTreeF1: 45.51, Throughput: 5.46 examples/sec
+PRED: ((It (was ((a ((three-month journey) (in ((the (dead (of (winter followed)))) (by (three (months (of labor)))))))) (on (Mackinac boats))))) .)
+GOLD: (It ((was ((a (three-month journey)) ((in ((the dead) (of winter))) (followed (by ((three months) (of (labor (on (Mackinac boats)))))))))) .))
+Epoch: 1, Batch: 6000/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.1307, TrainVAEPPL: 117.83, TrainReconPPL: 73.04, TrainKL: 6.70, TrainIWAEPPL: 76.17, |Param|: 733.90, BestValPerf: 107.81, BestValF1: 38.09, KLPen: 0.1740, GoldTreeF1: 45.55, Throughput: 5.47 examples/sec
+PRED: (But (, (uh ,)))
+GOLD: (But (, (uh ,)))
+Epoch: 1, Batch: 6500/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.1313, TrainVAEPPL: 117.42, TrainReconPPL: 72.80, TrainKL: 6.70, TrainIWAEPPL: 76.18, |Param|: 737.24, BestValPerf: 107.81, BestValF1: 38.09, KLPen: 0.1885, GoldTreeF1: 45.57, Throughput: 5.48 examples/sec
+PRED: ((The ((1988 (figures (were (restated (to (include (the (results (of (Lorimar (Telepictures Corp.))))))))))) (, (which ((Warner acquired) (in January)))))) .)
+GOLD: ((The (1988 figures)) ((were (restated (to (include ((the results) (of ((Lorimar (Telepictures Corp.)) (, (which (Warner (acquired (in January)))))))))))) .))
+Epoch: 1, Batch: 7000/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.1301, TrainVAEPPL: 116.79, TrainReconPPL: 72.44, TrainKL: 6.68, TrainIWAEPPL: 76.05, |Param|: 740.37, BestValPerf: 107.81, BestValF1: 38.09, KLPen: 0.2029, GoldTreeF1: 45.54, Throughput: 5.48 examples/sec
+PRED: (Oh (, (really ?)))
+GOLD: (Oh (, (really ?)))
+Epoch: 1, Batch: 7500/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.1296, TrainVAEPPL: 116.85, TrainReconPPL: 72.50, TrainKL: 6.71, TrainIWAEPPL: 76.39, |Param|: 743.80, BestValPerf: 107.81, BestValF1: 38.09, KLPen: 0.2174, GoldTreeF1: 45.50, Throughput: 5.45 examples/sec
+PRED: ((this (must (be (a (hard category))))) .)
+GOLD: (this ((must (be (a (hard category)))) .))
+Epoch: 1, Batch: 8000/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.1297, TrainVAEPPL: 116.43, TrainReconPPL: 72.26, TrainKL: 6.72, TrainIWAEPPL: 76.40, |Param|: 747.22, BestValPerf: 107.81, BestValF1: 38.09, KLPen: 0.2319, GoldTreeF1: 45.45, Throughput: 5.44 examples/sec
+PRED: (and ((((it seems) (in (the (last (decade (or two)))))) (, ((um ,) (that ('s true))))) ,))
+GOLD: (and (it ((seems ((in (the (last (decade (or two))))) (, (um (, (that ('s true))))))) ,)))
+Epoch: 1, Batch: 8500/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.1283, TrainVAEPPL: 116.07, TrainReconPPL: 72.05, TrainKL: 6.73, TrainIWAEPPL: 76.44, |Param|: 750.53, BestValPerf: 107.81, BestValF1: 38.09, KLPen: 0.2463, GoldTreeF1: 45.45, Throughput: 5.43 examples/sec
+PRED: ((If (((((you (find sound)) (, ((healthy companies) (in Japan)))) (, (they (are (not (for sale)))))) (, ('' (said (George Watanabe))))) (, (a (<unk> (at (Tokyo-based (Asia (Advisory (Services Inc)))))))))) .)
+GOLD: (((If (you (find ((sound (, (healthy companies))) (in Japan))))) (, (they (are (not (for sale)))))) (, ('' (said (((George Watanabe) (, ((a <unk>) (at (Tokyo-based (Asia (Advisory (Services Inc)))))))) .)))))
+Epoch: 1, Batch: 9000/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.1269, TrainVAEPPL: 115.71, TrainReconPPL: 71.84, TrainKL: 6.74, TrainIWAEPPL: 76.49, |Param|: 753.90, BestValPerf: 107.81, BestValF1: 38.09, KLPen: 0.2608, GoldTreeF1: 45.45, Throughput: 5.42 examples/sec
+PRED: (((And ((I think) (that (the (people (who ((are strongly) (in (favor (of (the (death (penalty (are (really ((working from) (that (gut level)))))))))))))))))) (. ((((((((Uh (, ((you know) (, (whether (it (be (a (biblical force))))))))) (, uh)) (, (you know))) (, (((the (eye (for (an eye)))) ,) (a (tooth (for (a tooth))))))) (, (a (life (for (a (life (type (logic (or just)))))))))) (, (uh (, (uh (, (some (sort (of (anger (at putting))))))))))) (, (uh (, ((murderers up) (in (federal (pens (for (the (rest (of (their life))))))))))))) (, (uh (, (while (we (foot (the bill)))))))))) .)
+GOLD: (And (I ((think (that (((the people) (who (are (strongly (in (favor (of (the (death penalty))))))))) (are (really (working ((from (that (gut level))) (. (Uh ((, ((you know) ,)) (whether (it (be (((a (biblical force)) (, (uh ((, ((you know) ,)) (the ((eye (for (an eye))) (, ((a (tooth (for (a tooth)))) (, ((a (life (for (a life)))) (type logic))))))))))) (or (just (, (uh (, (uh (, ((some sort) (of (anger (at (putting (, (uh (, (murderers (up ((in (federal pens)) ((for ((the rest) (of (their life)))) (, (uh (, (while (we (foot (the bill)))))))))))))))))))))))))))))))))))))))) .)))
+Epoch: 1, Batch: 9500/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.1258, TrainVAEPPL: 115.55, TrainReconPPL: 71.76, TrainKL: 6.75, TrainIWAEPPL: 76.67, |Param|: 757.20, BestValPerf: 107.81, BestValF1: 38.09, KLPen: 0.2753, GoldTreeF1: 45.45, Throughput: 5.42 examples/sec
+PRED: ((Then ((off again) (, (rushing (to (keep up)))))) .)
+GOLD: (Then (off (again (, ((rushing (to (keep up))) .)))))
+Epoch: 1, Batch: 10000/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.1250, TrainVAEPPL: 115.09, TrainReconPPL: 71.49, TrainKL: 6.74, TrainIWAEPPL: 76.63, |Param|: 760.50, BestValPerf: 107.81, BestValF1: 38.09, KLPen: 0.2898, GoldTreeF1: 45.47, Throughput: 5.45 examples/sec
+PRED: ((oh (, absolutely)) ,)
+GOLD: (oh (, (absolutely ,)))
+Epoch: 1, Batch: 10500/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.1244, TrainVAEPPL: 114.90, TrainReconPPL: 71.38, TrainKL: 6.74, TrainIWAEPPL: 76.78, |Param|: 763.89, BestValPerf: 107.81, BestValF1: 38.09, KLPen: 0.3043, GoldTreeF1: 45.46, Throughput: 5.44 examples/sec
+PRED: ((Well (, (get (((your pa) (and get)) (that (whisky '')))))) .)
+GOLD: (Well (, (((get (your pa)) (and (get (that whisky)))) ('' .))))
+Epoch: 1, Batch: 11000/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.1247, TrainVAEPPL: 114.55, TrainReconPPL: 71.20, TrainKL: 6.73, TrainIWAEPPL: 76.83, |Param|: 767.14, BestValPerf: 107.81, BestValF1: 38.09, KLPen: 0.3189, GoldTreeF1: 45.46, Throughput: 5.44 examples/sec
+PRED: ((they did) .)
+GOLD: (they (did .))
+Epoch: 1, Batch: 11500/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.1264, TrainVAEPPL: 114.19, TrainReconPPL: 71.02, TrainKL: 6.72, TrainIWAEPPL: 76.89, |Param|: 770.42, BestValPerf: 107.81, BestValF1: 38.09, KLPen: 0.3334, GoldTreeF1: 45.49, Throughput: 5.45 examples/sec
+PRED: (`` ((You ((<unk> <unk>) ?)) ?))
+GOLD: (`` (You ((<unk> <unk>) (? ?))))
+Epoch: 1, Batch: 12000/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.1292, TrainVAEPPL: 114.15, TrainReconPPL: 71.03, TrainKL: 6.72, TrainIWAEPPL: 77.15, |Param|: 773.61, BestValPerf: 107.81, BestValF1: 38.09, KLPen: 0.3479, GoldTreeF1: 45.46, Throughput: 5.44 examples/sec
+PRED: ((Kind (of neighborhood)) .)
+GOLD: (Kind ((of neighborhood) .))
+Epoch: 1, Batch: 12500/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.1308, TrainVAEPPL: 113.94, TrainReconPPL: 70.92, TrainKL: 6.70, TrainIWAEPPL: 77.28, |Param|: 776.72, BestValPerf: 107.81, BestValF1: 38.09, KLPen: 0.3624, GoldTreeF1: 45.47, Throughput: 5.46 examples/sec
+PRED: ((All right) .)
+GOLD: (All (right .))
+Epoch: 1, Batch: 13000/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.1315, TrainVAEPPL: 113.74, TrainReconPPL: 70.83, TrainKL: 6.69, TrainIWAEPPL: 77.43, |Param|: 779.80, BestValPerf: 107.81, BestValF1: 38.09, KLPen: 0.3769, GoldTreeF1: 45.47, Throughput: 5.45 examples/sec
+PRED: (Uh-huh .)
+GOLD: (Uh-huh .)
+Epoch: 1, Batch: 13500/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.1327, TrainVAEPPL: 113.43, TrainReconPPL: 70.68, TrainKL: 6.68, TrainIWAEPPL: 77.51, |Param|: 782.90, BestValPerf: 107.81, BestValF1: 38.09, KLPen: 0.3914, GoldTreeF1: 45.48, Throughput: 5.47 examples/sec
+PRED: ((they (do (n't (really (pay (a (whole (lot (of (attention (to <unk>))))))))))) .)
+GOLD: (they ((do (n't (really (pay (((a (whole lot)) (of attention)) (to <unk>)))))) .))
+Epoch: 1, Batch: 14000/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.1330, TrainVAEPPL: 113.18, TrainReconPPL: 70.55, TrainKL: 6.66, TrainIWAEPPL: 77.61, |Param|: 786.12, BestValPerf: 107.81, BestValF1: 38.09, KLPen: 0.4059, GoldTreeF1: 45.49, Throughput: 5.46 examples/sec
+PRED: (have (you ((recycled (plastic also)) ?)))
+GOLD: (have (you ((recycled (plastic also)) ?)))
+Epoch: 1, Batch: 14500/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.1342, TrainVAEPPL: 112.91, TrainReconPPL: 70.41, TrainKL: 6.65, TrainIWAEPPL: 77.69, |Param|: 789.23, BestValPerf: 107.81, BestValF1: 38.09, KLPen: 0.4204, GoldTreeF1: 45.50, Throughput: 5.48 examples/sec
+PRED: (but ((he ('s (really (from France)))) ,))
+GOLD: (but (he (('s (really (from France))) ,)))
+Epoch: 1, Batch: 15000/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.1363, TrainVAEPPL: 112.73, TrainReconPPL: 70.34, TrainKL: 6.64, TrainIWAEPPL: 77.88, |Param|: 792.41, BestValPerf: 107.81, BestValF1: 38.09, KLPen: 0.4349, GoldTreeF1: 45.49, Throughput: 5.47 examples/sec
+PRED: (Uh-huh .)
+GOLD: (Uh-huh .)
+Epoch: 1, Batch: 15500/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.1386, TrainVAEPPL: 112.55, TrainReconPPL: 70.27, TrainKL: 6.65, TrainIWAEPPL: 78.06, |Param|: 795.61, BestValPerf: 107.81, BestValF1: 38.09, KLPen: 0.4494, GoldTreeF1: 45.47, Throughput: 5.45 examples/sec
+PRED: ((In (our ((((age (of Science)) (and (Angst (it (seems (to (me (more (brave (to stay)))))))))) (on Earth)) (and (explore (inner (man (than (to (fly (far (from (the ((sphere (of (our sorrow))) (and (explore (outer (space '')))))))))))))))))) .)
+GOLD: ((In ((our age) (of (Science (and Angst))))) (it ((seems ((to me) ((more brave) ((to ((stay (on Earth)) (and (explore (inner man))))) (than (to ((fly (far (from ((the sphere) (of (our sorrow)))))) (and (explore (outer space)))))))))) ('' .))))
+Epoch: 1, Batch: 16000/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.1410, TrainVAEPPL: 112.26, TrainReconPPL: 70.13, TrainKL: 6.64, TrainIWAEPPL: 78.14, |Param|: 798.69, BestValPerf: 107.81, BestValF1: 38.09, KLPen: 0.4639, GoldTreeF1: 45.47, Throughput: 5.43 examples/sec
+PRED: ((I ('m (((an (electrical engineer)) (by (trade ((uh ,) here)))) (in Virginia)))) .)
+GOLD: (I (('m ((an (electrical engineer)) ((by trade) (uh (, (here (in Virginia))))))) .))
+Epoch: 1, Batch: 16500/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.1435, TrainVAEPPL: 112.11, TrainReconPPL: 70.05, TrainKL: 6.65, TrainIWAEPPL: 78.33, |Param|: 801.87, BestValPerf: 107.81, BestValF1: 38.09, KLPen: 0.4785, GoldTreeF1: 45.45, Throughput: 5.43 examples/sec
+PRED: (Hewlett ((Packard makes) ,))
+GOLD: ((Hewlett Packard) (makes ,))
+Epoch: 1, Batch: 17000/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.1453, TrainVAEPPL: 111.89, TrainReconPPL: 69.94, TrainKL: 6.64, TrainIWAEPPL: 78.46, |Param|: 804.94, BestValPerf: 107.81, BestValF1: 38.09, KLPen: 0.4930, GoldTreeF1: 45.44, Throughput: 5.44 examples/sec
+PRED: ((On (((Sept. 13) (, (Japan (began (a (policy (of (screening (boat people))))))))) (, (accepting (only (those (deemed (to (be (political refugees)))))))))) .)
+GOLD: ((On (Sept. 13)) (, (Japan ((began (((a policy) (of (screening (boat people)))) (, (accepting ((only those) (deemed (to (be (political refugees))))))))) .))))
+--------------------------------
+Checking validation perf...
+ElboPPL: 102.34, ReconPPL: 66.02, KL: 6.2389, IwaePPL: 101.91, CorpusF1: 38.06, SentAvgF1: 31.79
+--------------------------------
+Saving checkpoint to urnng.pt
+Starting epoch 2
+Epoch: 2, Batch: 500/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.2253, TrainVAEPPL: 112.86, TrainReconPPL: 71.25, TrainKL: 6.96, TrainIWAEPPL: 89.96, |Param|: 809.22, BestValPerf: 101.91, BestValF1: 38.06, KLPen: 0.5146, GoldTreeF1: 45.40, Throughput: 7.51 examples/sec
+PRED: ((did ((n't (have (to (have (lots (of (expensive (machinery to)))))))) (, (uh (, ((get (your heating)) (and (cooling (cycles (to work)))))))))) .)
+GOLD: ((did (n't (have ((to (have (lots (of (expensive machinery))))) (to (, (uh (, (get ((your (heating (and (cooling cycles)))) (to work))))))))))) .)
+Epoch: 2, Batch: 1000/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.2219, TrainVAEPPL: 112.48, TrainReconPPL: 71.02, TrainKL: 6.83, TrainIWAEPPL: 89.95, |Param|: 811.88, BestValPerf: 101.91, BestValF1: 38.06, KLPen: 0.5290, GoldTreeF1: 45.39, Throughput: 7.71 examples/sec
+PRED: (((Since then) (, (((Moon ('s (organization (has (inaugurated (a (pair (of (high-quality (glossy (opinion magazines))))))))))) (, (((The World) (and I)) (and Insight)))) (, (which (are (a (further drain)))))))) .)
+GOLD: ((Since then) (, (((Moon 's) organization) ((has (inaugurated (((a pair) (of (high-quality (glossy (opinion magazines))))) (, ((((The World) (and I)) (and Insight)) (, (which (are (a (further drain)))))))))) .))))
+Epoch: 2, Batch: 1500/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.2276, TrainVAEPPL: 112.20, TrainReconPPL: 70.91, TrainKL: 6.84, TrainIWAEPPL: 90.08, |Param|: 814.65, BestValPerf: 101.91, BestValF1: 38.06, KLPen: 0.5435, GoldTreeF1: 45.38, Throughput: 7.76 examples/sec
+PRED: (Uh-huh .)
+GOLD: (Uh-huh .)
+Epoch: 2, Batch: 2000/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.2278, TrainVAEPPL: 111.80, TrainReconPPL: 70.57, TrainKL: 6.79, TrainIWAEPPL: 90.00, |Param|: 817.30, BestValPerf: 101.91, BestValF1: 38.06, KLPen: 0.5579, GoldTreeF1: 45.39, Throughput: 7.80 examples/sec
+PRED: (and (((there ('s (no (mountains (or anything))))) (, (you know))) ,))
+GOLD: (and (there (('s ((no (mountains (or anything))) (, (you know)))) ,)))
+Epoch: 2, Batch: 2500/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.2254, TrainVAEPPL: 111.37, TrainReconPPL: 70.24, TrainKL: 6.75, TrainIWAEPPL: 89.91, |Param|: 820.02, BestValPerf: 101.91, BestValF1: 38.06, KLPen: 0.5725, GoldTreeF1: 45.39, Throughput: 7.86 examples/sec
+PRED: ((we ((do (have (the (health (care (uh ,)))))) (and (the dental)))) .)
+GOLD: (we ((do (have ((the (health care)) (uh (, (and (the dental))))))) .))
+Epoch: 2, Batch: 3000/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.2280, TrainVAEPPL: 112.12, TrainReconPPL: 70.70, TrainKL: 6.74, TrainIWAEPPL: 90.82, |Param|: 822.56, BestValPerf: 101.91, BestValF1: 38.06, KLPen: 0.5869, GoldTreeF1: 45.37, Throughput: 7.83 examples/sec
+PRED: (Yeah .)
+GOLD: (Yeah .)
+Epoch: 2, Batch: 3500/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.2303, TrainVAEPPL: 111.97, TrainReconPPL: 70.68, TrainKL: 6.74, TrainIWAEPPL: 91.05, |Param|: 825.15, BestValPerf: 101.91, BestValF1: 38.06, KLPen: 0.6015, GoldTreeF1: 45.36, Throughput: 7.83 examples/sec
+PRED: (Uh-huh .)
+GOLD: (Uh-huh .)
+Epoch: 2, Batch: 4000/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.2302, TrainVAEPPL: 111.42, TrainReconPPL: 70.31, TrainKL: 6.70, TrainIWAEPPL: 90.88, |Param|: 827.68, BestValPerf: 101.91, BestValF1: 38.06, KLPen: 0.6160, GoldTreeF1: 45.37, Throughput: 7.92 examples/sec
+PRED: ((It ('s (one (of (our (favorite movies)))))) .)
+GOLD: (It (('s (one (of (our (favorite movies))))) .))
+Epoch: 2, Batch: 4500/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.2299, TrainVAEPPL: 111.32, TrainReconPPL: 70.24, TrainKL: 6.65, TrainIWAEPPL: 91.08, |Param|: 830.04, BestValPerf: 101.91, BestValF1: 38.06, KLPen: 0.6305, GoldTreeF1: 45.39, Throughput: 8.00 examples/sec
+PRED: (Well (, (((I (really (did (enjoy it)))) (, (uh (, (you know))))) ,)))
+GOLD: (Well (, (I (really ((did (enjoy (it (, (uh (, (you know))))))) ,)))))
+Epoch: 2, Batch: 5000/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.2319, TrainVAEPPL: 111.60, TrainReconPPL: 70.43, TrainKL: 6.64, TrainIWAEPPL: 91.61, |Param|: 832.35, BestValPerf: 101.91, BestValF1: 38.06, KLPen: 0.6450, GoldTreeF1: 45.37, Throughput: 8.02 examples/sec
+PRED: (Yeah ,)
+GOLD: (Yeah ,)
+Epoch: 2, Batch: 5500/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.2326, TrainVAEPPL: 111.72, TrainReconPPL: 70.48, TrainKL: 6.60, TrainIWAEPPL: 92.00, |Param|: 834.73, BestValPerf: 101.91, BestValF1: 38.06, KLPen: 0.6594, GoldTreeF1: 45.38, Throughput: 8.09 examples/sec
+PRED: (and ((I ((put them) (in (this home)))) ,))
+GOLD: (and (I ((put (them (in (this home)))) ,)))
+Epoch: 2, Batch: 6000/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.2371, TrainVAEPPL: 112.28, TrainReconPPL: 70.82, TrainKL: 6.64, TrainIWAEPPL: 92.78, |Param|: 837.19, BestValPerf: 101.91, BestValF1: 38.06, KLPen: 0.6739, GoldTreeF1: 45.37, Throughput: 8.02 examples/sec
+PRED: (or ,)
+GOLD: (or ,)
+Epoch: 2, Batch: 6500/17309, LR: 1.0000, qLR: 0.00010, qEnt: 0.2388, TrainVAEPPL: 112.53, TrainReconPPL: 70.96, TrainKL: 6.64, TrainIWAEPPL: 93.29, |Param|: 839.61, BestValPerf: 101.91, BestValF1: 38.06, KLPen: 0.6884, GoldTreeF1: 45.36, Throughput: 8.03 examples/sec
+PRED: ((The (((<unk> (over (abortion (is (certain (to (contribute ((to (further delays)) and)))))))) (, (apart (((from (the health)) (and (education (measure vetoed)))) (by (Mr. Bush)))))) (, (bills (funding (the ((District (of Columbia)) (and (the (entire (U.S. (<unk> ((budget are) (in (jeopardy (because (of (related (abortion (or (family-planning issues))))))))))))))))))))) .)
+GOLD: ((((The <unk>) (over abortion)) (is (certain (to (contribute (to (further delays))))))) (and (, (((apart (from ((the (health (and (education measure)))) (vetoed (by (Mr. Bush)))))) (, ((bills (funding (((the District) (of Columbia)) (and (the (entire (U.S. (<unk> budget)))))))) (are ((in jeopardy) (because (of (related (abortion (or (family-planning issues))))))))))) .))))
+Traceback (most recent call last):
+  File "C:\git\rnng-and-rts\urnng\train.py", line 349, in <module>
+    main(args)
+  File "C:\git\rnng-and-rts\urnng\train.py", line 191, in main
+    (-obj.mean()).backward()
+  File "C:\Users\Brighton\anaconda3\envs\myenv\lib\site-packages\torch\_tensor.py", line 255, in backward
+    torch.autograd.backward(self, gradient, retain_graph, create_graph, inputs=inputs)
+  File "C:\Users\Brighton\anaconda3\envs\myenv\lib\site-packages\torch\autograd\__init__.py", line 147, in backward
+    Variable._execution_engine.run_backward(
+KeyboardInterrupt

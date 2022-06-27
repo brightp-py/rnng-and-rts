@@ -56,6 +56,7 @@ parser.add_argument('--q_max_grad_norm', default=1, type=float, help='gradient c
 parser.add_argument('--gpu', default=2, type=int, help='which gpu to use')
 parser.add_argument('--seed', default=3435, type=int, help='random seed')
 parser.add_argument('--print_every', type=int, default=500, help='print stats after this many batches')
+parser.add_argument('--wandb', action='store_true', help='visualize training with the Weights&Biases application')
 
 
 def main(args):
@@ -103,6 +104,19 @@ def main(args):
   action_optimizer = torch.optim.SGD(action_params, lr=args.action_lr)
   model.train()
   model.cuda()
+
+  # Weights and Biases
+  if args.wandb:
+    import wandb
+    wandb.init(project="Train URNNG", entity="wordlab")
+    wandb.config = {
+      "learning_rate": args.lr,
+      "inference_network_lr": args.q_lr,
+      "action_layer_lr": args.action_lr,
+      "epochs": args.num_epochs,
+      "batch_size": train_data.batch_size
+    }
+    wandb.watch(model)
 
   epoch = 0
   decay= 0
@@ -198,7 +212,7 @@ def main(args):
                   'GoldTreeF1: %.2f, Throughput: %.2f examples/sec'
         print(log_str %
               (epoch, b, len(train_data), args.lr, args.q_lr, train_q_entropy / num_sents, 
-               np.exp((train_nll_recon + train_kl)/ num_words),
+               np.exp((train_nll_recon + train_kl) / num_words),
                np.exp(train_nll_recon/num_words), train_kl / num_sents, 
                np.exp(train_nll_iwae/num_words),
                param_norm, best_val_ppl, best_val_f1, kl_pen, 
@@ -206,6 +220,13 @@ def main(args):
         sent_str = [train_data.idx2word[word_idx] for word_idx in list(sents[-1][1:-1].cpu().numpy())]
         print("PRED:", get_tree(action[:-2], sent_str))
         print("GOLD:", get_tree(gold_binary_trees[-1], sent_str))
+        if args.wandb:
+          wandb.log({
+            "VAE Perplexity": np.exp((train_nll_recon + train_kl) / num_words),
+            "Recon Perplexity": np.exp(train_nll_recon/num_words),
+            "Kullback-Leibler": train_kl / num_sents,
+            "Best Value PPL": best_val_ppl
+          })
     print('--------------------------------')
     print('Checking validation perf...')    
     val_ppl, val_f1 = eval(val_data, model, 
