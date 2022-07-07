@@ -216,7 +216,7 @@ df_surp[order(df_surp$leaf_surp / df_surp$lstm_surp),
 # stats
 
 ```{r}
-m_1 <- lmer(log(rt) ~ freq + word_length + branch_surp + (1 | worker_id), data = df_rtsurp)
+m_1 <- lmer(rt ~ word_length + branch_surp + (1 | worker_id), data = df_rtsurp)
 summary(m_1)
 ```
 
