@@ -1,0 +1,239 @@
+# Introduction
+
+## Inspiration and Prior Work
+
+This analysis attempts to replicate the process Bicknell and Goodkind (2018),
+which in turn takes inspiration from Smith and Levy (2013).
+
+These analyses make use of the `mgcv` R package to run a generalized additive
+mixed-effects model (GAMMs) on each of the machine learning models (Wood,
+2014).
+
+We expand upon the analysis performed in Bicknell and Goodkind by
+including the Recurrent Neural Network Grammar (RNNG) model (Dyer et al.,
+2016).
+
+## Summary
+
+One GAMM is generated for each of the machine learning models. The GAMM
+attempts to predict the gaze duration on a word (referred to in our analysis as
+the reading time) as a function of:
+
+- A linear surprisal term for the current word
+- A linear surprisal term for the previous word
+- Random intercepts for unique readers
+- A tensor product between word length and word log-frequency for the current
+  word
+- A tensor product between word length and word log-frequency for the previous
+  word
+- A "spline effect of word number within the text"
+- A binary variable, which is true when the previous word received a fixation
+
+# Analysis
+
+## Preliminaries
+
+```{r setup, message = FALSE, warning = FALSE}
+library(here)
+library(mgcv)
+library(tidyverse) # for data processing
+library(knitr)
+library(lmerTest)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+df_rnng <- read_tsv(here("data/naturalstories_rnng.output"))
+df_lstm <- read_tsv(here("data/naturalstories_lstm.output"))
+df_ids <- read_tsv(here("data/ids.tsv"))
+df_rts <- read_tsv(here("data/processed_RTs.tsv"))
+df_freq <- read_tsv(here("data/freq/freqs-1.tsv")) ## '1' as in unigram
+df_bigram <- read_tsv(here("data/freq/freqs-2.tsv"))
+df_trigram <- read_tsv(here("data/freq/freqs-3.tsv"))
+df_quadgram <- read_tsv(here("data/freq/freqs-4.tsv"))
+```
+
+```{r}
+col_names <- c("sent", "sent_pos")
+suffixes <- c("", ".duplicate")
+
+df_surp <- left_join(df_ids, df_rnng, by = col_names, suffix = suffixes) %>%
+    select(-ends_with(".duplicate")) %>%
+    mutate(story_pos = if_else(story == 1, story_pos + 1, story_pos))
+
+df_surp <- left_join(df_surp, df_lstm, by = col_names, suffix = suffixes) %>%
+    select(-ends_with(".duplicate"))
+
+df_missing_rnng <- filter(df_surp, is.na(leaf_surp))
+df_surp <- filter(df_surp, !is.na(leaf_surp))
+```
+
+## Collapse rows from same zone, sum surprisals over zone
+
+```{r}
+
+df_surp <- df_surp %>%
+    group_by(story, story_pos, sent) %>%
+    summarize(
+        positions = str_c(sent_pos, collapse = "; "),
+        word = str_c(word, collapse = "_"),
+        indices = str_c(index, collapse = "; "),
+        depths = str_c(depth, collapse = "; "),
+        leaf_surp = sum(leaf_surp),
+        branch_surp = sum(branch_surp),
+        lstm_surp = sum(lstm_surp),
+        total_words = n()
+    )
+
+df_surp_zone_count <- df_surp %>%
+    group_by(story) %>%
+    count()
+```
+
+## Including word frequencies and bigram, etc.
+
+```{r}
+## add a "token code" column of format "[story].[story_pos].whole"
+df_surp$code <- paste(df_surp$story, df_surp$story_pos, "whole", sep = ".")
+
+df_surp <- left_join(df_surp, df_freq, by = "code")
+df_surp <- left_join(df_surp, df_bigram, by = "code")
+df_surp <- left_join(df_surp, df_trigram, by = "code")
+df_surp <- left_join(df_surp, df_quadgram, by = "code")
+```
+
+## Pulling in RTs
+
+Count the item/zone rows to see if it matches the surprisal dataframe. 
+
+```{r}
+df_rt_count <- df_rts %>%
+    group_by(story, story_pos) %>%
+    count()
+
+df_zone_count <- df_rt_count %>%
+    group_by(story) %>%
+    count()
+
+# this is a join just to check for items with RTs but without surprisals
+df_missing_surp <-
+    left_join(df_rt_count, df_surp, by = c("story", "story_pos")) %>%
+    filter(is.na(indices))
+```
+
+Create joined RT with surprisal dataframe and remove rows where there is no
+surprisal.
+
+```{r}
+df_rtsurp <- left_join(df_rts, df_surp, by = c("story", "story_pos")) %>%
+    filter(!is.na(leaf_surp)) %>%
+    arrange(story, story_pos)
+```
+
+Count trials per story/zone.
+
+```{r}
+df_words <- df_rtsurp %>%
+    group_by(story, story_pos, word) %>%
+    count()
+```
+
+Add word length.
+
+```{r}
+df_rtsurp$word_length <- nchar(df_rtsurp$word.x)
+```
+ 
+Add a column with story/zone identifier.
+
+```{r}
+df_rtsurp <- df_rtsurp %>%
+    mutate(story_zone = str_c(story, story_pos, sep = "_"))
+```
+
+Summarize by story/zone means.
+
+```{r}
+# df_zonemeans <- df_rtsurp %>%
+#     group_by(story_zone, leaf_surp, freq) %>%
+#     summarize(
+#         mean_rt = mean(rt, na.rm = TRUE)
+#     )
+```
+
+## GAMM
+
+```{r}
+surp_columns <- c("leaf_surp", "branch_surp", "lstm_surp", "bigram", "trigram",
+    "quadgram", "word_length", "freq")
+id_columns <- c("story", "story_pos", "worker_id")
+df_rtsurp_prior <- df_rtsurp %>%
+    mutate(story_pos = story_pos + 1)
+
+df_rtsurp <- merge(df_rtsurp, df_rtsurp_prior[c(id_columns, surp_columns)],
+    by = id_columns, suffixes = c("", "_prior"))
+
+df_rtsurp$worker_id <- as.factor(df_rtsurp$worker_id)
+```
+
+## Get logLik for covariate model
+```{r}
+cov <- gam(rt ~ te(word_length, freq) + te(word_length_prior, freq_prior)
+    + s(worker_id, bs = "re"), data = df_rtsurp)
+```
+
+```{r}
+m_lstm <- gam(rt ~ lstm_surp + lstm_surp_prior + te(word_length, freq)
+    + te(word_length_prior, freq_prior) + s(worker_id, bs = "re"),
+    data = df_rtsurp)
+
+m_branch <- gam(rt ~ branch_surp + branch_surp_prior + te(word_length, freq)
+    + te(word_length_prior, freq_prior) + s(worker_id, bs = "re"),
+    data = df_rtsurp)
+
+m_leaf <- gam(rt ~ leaf_surp + leaf_surp_prior + te(word_length, freq)
+    + te(word_length_prior, freq_prior) + s(worker_id, bs = "re"),
+    data = df_rtsurp)
+
+m_bigram <- gam(rt ~ bigram + bigram_prior + te(word_length, freq)
+    + te(word_length_prior, freq_prior) + s(worker_id, bs = "re"),
+    data = df_rtsurp)
+
+m_trigram <- gam(rt ~ trigram + trigram_prior + te(word_length, freq)
+    + te(word_length_prior, freq_prior) + s(worker_id, bs = "re"),
+    data = df_rtsurp)
+
+m_quadgram <- gam(rt ~ quadgram + quadgram_prior + te(word_length, freq)
+    + te(word_length_prior, freq_prior) + s(worker_id, bs = "re"),
+    data = df_rtsurp)
+```
+
+```{r}
+ll <- c(logLik.gam(m_lstm), logLik.gam(m_branch), logLik.gam(m_leaf),
+    logLik.gam(m_bigram), logLik.gam(m_trigram))
+ll <- ll - logLik.gam(cov)
+ll
+```
+
+# Sources
+
+    Dyer, Chris, Adhiguna Kuncoro, Miguel Ballesteros, and Noah A. Smith. 2016.
+        Recurrent Neural Network Grammars. In Proceedings of the 2016
+        Conference of the North American Chapter of the Association for
+        Computational Linguistics: Human Language Technologies, pages 199-209,
+        San Diego, California. Association for Computational Linguistics.
+        https://aclanthology.org/N16-1024/
+
+    Goodkind, Adam, and Klinton Bicknell. "Predictive power of word surprisal
+        for reading times is a linear function of language model quality."
+        Proceedings of the 8th workshop on cognitive modeling and computational
+        linguistics (CMCL 2018). 2018. https://aclanthology.org/W18-0102.pdf.
+
+    Smith, Nathaniel J., and Roger Levy. "The effect of word predictability on
+        reading time is logarithmic." Cognition 128.3 (2013): 302-319.
+        https://www.sciencedirect.com/science/article/pii/S0010027713000413
+
+    Wood, Simon N. "Stable and efficient multiple smoothing parameter
+        estimation for generalized additive models." Journal of the American
+        Statistical Association 99.467 (2004): 673-686.
+        https://www.tandfonline.com/doi/abs/10.1198/016214504000000980
