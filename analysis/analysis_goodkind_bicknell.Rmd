@@ -92,6 +92,13 @@ df_surp_zone_count <- df_surp %>%
 
 ## Including word frequencies and bigram, etc.
 
+Convert frequencies into log-probability-type values.
+```{r}
+df_bigram$bigram <- log(df_bigram$bigram / df_bigram$bigramn)
+df_trigram$trigram <- log(df_trigram$trigram / df_trigram$trigramn)
+df_quadgram$quadgram <- log(df_quadgram$quadgram / df_quadgram$quadgramn)
+```
+
 ```{r}
 ## add a "token code" column of format "[story].[story_pos].whole"
 df_surp$code <- paste(df_surp$story, df_surp$story_pos, "whole", sep = ".")
@@ -176,6 +183,23 @@ df_rtsurp <- merge(df_rtsurp, df_rtsurp_prior[c(id_columns, surp_columns)],
 df_rtsurp$worker_id <- as.factor(df_rtsurp$worker_id)
 ```
 
+Remove any rows with missing surprisals.
+
+```{r}
+surp_columns <- c("leaf_surp", "branch_surp", "lstm_surp", "bigram", "trigram",
+    "quadgram", "word_length", "freq")
+prior_columns <- c("leaf_surp_prior", "branch_surp_prior", "lstm_surp_prior",
+    "bigram_prior", "trigram_prior", "quadgram_prior")
+
+nrows <- nrow(df_rtsurp)
+df_rtsurp <- df_rtsurp[!any(is.na(surp_columns))]
+nrows2 <- nrow(df_rtsurp)
+df_rtsurp <- filter(df_rtsurp, !any(is.na(prior_columns)))
+nrows3 <- nrow(df_rtsurp)
+
+sprintf("Removed %d rows (%d on word, %d prior)", nrows3 - nrows, nrows2 - nrows, nrows3 - nrows2)
+```
+
 ## Get logLik for covariate model
 ```{r}
 cov <- gam(rt ~ te(word_length, freq) + te(word_length_prior, freq_prior)
@@ -194,7 +218,9 @@ m_branch <- gam(rt ~ branch_surp + branch_surp_prior + te(word_length, freq)
 m_leaf <- gam(rt ~ leaf_surp + leaf_surp_prior + te(word_length, freq)
     + te(word_length_prior, freq_prior) + s(worker_id, bs = "re"),
     data = df_rtsurp)
+```
 
+```{r}
 m_bigram <- gam(rt ~ bigram + bigram_prior + te(word_length, freq)
     + te(word_length_prior, freq_prior) + s(worker_id, bs = "re"),
     data = df_rtsurp)
